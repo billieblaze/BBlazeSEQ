@@ -16,6 +16,31 @@ BBlazeSeq v0.3
 
 String version = "0.3";
 
+// Init shiftMatrixPWM LED Matrix
+
+//Data pin is MOSI (atmega168/328: pin 11. Mega: 51) 
+//Clock pin is SCK (atmega168/328: pin 13. Mega: 52)
+const int ShiftMatrixPWM_columnLatchPin=3;
+const int ShiftMatrixPWM_rowDataPin=A2;
+const int ShiftMatrixPWM_rowClockPin=A3;
+const int ShiftMatrixPWM_rowLatchPin=A4;
+
+const bool ShiftMatrixPWM_invertColumnOutputs = 0; // if invertColumnOutputs is 1, outputs will be active low. Usefull for common anode RGB led's.
+const bool ShiftMatrixPWM_invertRowOutputs = 1; // if invertOutputs is 1, outputs will be active low. Used for PNP transistors.
+
+#include <ShiftMatrixPWM.h>   // include ShiftMatrixPWM.h after setting the pins!
+
+unsigned char maxBrightness = 63;
+unsigned char pwmFrequency = 60;
+int numColumnRegisters =3;
+int numRows=4;
+
+int numColumns = numColumnRegisters*4;
+int numOutputs = numColumns*numRows;
+
+int j = 0;
+
+
 // LCD Keys
 LiquidCrystal lcd(8, 9, 4, 5, 6, 7); 
 DFR_Key keypad;
@@ -41,32 +66,6 @@ int currentChannel = 0;  // which channel are we viewing?
 int  noteoff_times[noteoff_size];
 byte noteoff_notes[noteoff_size];
 byte noteoff_chans[noteoff_size];
-
-
-// shiftMatrixPWM LED Matrix
-
-//Data pin is MOSI (atmega168/328: pin 11. Mega: 51) 
-//Clock pin is SCK (atmega168/328: pin 13. Mega: 52)
-const int ShiftMatrixPWM_columnLatchPin=3;
-const int ShiftMatrixPWM_rowDataPin=A1;
-const int ShiftMatrixPWM_rowClockPin=A2;
-const int ShiftMatrixPWM_rowLatchPin=A3;
-
-const bool ShiftMatrixPWM_invertColumnOutputs = 0; // if invertColumnOutputs is 1, outputs will be active low. Usefull for common anode RGB led's.
-
-const bool ShiftMatrixPWM_invertRowOutputs = 1; // if invertOutputs is 1, outputs will be active low. Used for PNP transistors.
-
-#include <ShiftMatrixPWM.h>   // include ShiftMatrixPWM.h after setting the pins!
-
-unsigned char maxBrightness = 63;
-unsigned char pwmFrequency = 60;
-int numColumnRegisters =3;
-int numRows=4;
-
-int numColumns = numColumnRegisters*4;
-int numOutputs = numColumns*numRows;
-
-int j = 0;
 
 // Menu 
 MenuBackend menu = MenuBackend(menuUseEvent,menuChangeEvent);
@@ -115,7 +114,7 @@ void setGroupOf3(int row, int start, int r, int g, int b){
      ShiftMatrixPWM.SetOne(row, start+2, b);
 }
 
-void active(){ 
+void showActiveNotes(){ 
 setGroupOf3(0, 0, 155,12,120);
    setGroupOf3(1, 3, 155,12,120);
    setGroupOf3(1, 9, 155,12,120);
@@ -138,8 +137,7 @@ void setup() {
   // setup keys
   keypad.setRate(1000);
  
-  // Start Midi
-  Serial.begin(31250);
+  
   
   //Setup LED Matrix
   pinMode(ShiftMatrixPWM_columnLatchPin, OUTPUT); 
@@ -156,6 +154,9 @@ void setup() {
   ShiftMatrixPWM.SetMatrixSize(numRows, numColumnRegisters);
   ShiftMatrixPWM.Start(pwmFrequency,maxBrightness);  
   ShiftMatrixPWM.SetAll(0);
+  
+  // Start Midi
+  Serial.begin(31250);
   
   // set channels / patches
   for (int ch=0; ch<melody_count; ch++){
@@ -188,29 +189,19 @@ void loop() {
   // First, deal with any Note Offs which need to be sent.
   check_noteoffs(tick_counter);
  
-   // ShiftMatrixPWM
-    for(int row=0;row<numRows;row++){
-    for(int col=0;col<numColumns-1;col++){
-      for(int brightness=0;brightness<maxBrightness;brightness++){
-        ShiftMatrixPWM.SetOne(row, col+1,brightness);
-        ShiftMatrixPWM.SetOne(row,col,maxBrightness-brightness);
-        delay(3);
-        active();
-      }
-    }
-  }
-  
+   showActiveNotes();
   // Update current position in the bar, 0 -> 31
    if( runMode == 1){position = tick_counter % tpb;}
  
  
    // check the keyboard 
   localKey = keypad.getKey();
+  
   if (localKey != SAMPLE_WAIT){
       
      if(runMode == 0 && editMode == 0){ 
        switch (localKey) {
-  	case 3: menu.moveUp(); break;
+  	case 3: lcd.print('up');menu.moveUp(); break;
   	case 4: menu.moveDown(); break;
   	case 5: menu.moveRight(); break;
   	case 2: menu.moveLeft(); break;
@@ -271,7 +262,100 @@ void loop() {
       }
       
   } else if (runMode == 1 && editMode == 0){  
-      lcd.clear();
+         int row, col;
+  switch(position){ 
+   case 0: 
+      row=0;
+      col=0; 
+      break;
+   case 1: 
+     row=0;
+     col=1;
+     break;
+    case 2: 
+     row=0;
+     col=2;
+     break;
+case 3: 
+     row=0;
+     col=3;
+     break;
+     
+case 4: 
+     row=1;
+     col=0;
+     break;
+     
+case 5: 
+     row=1;
+     col=1;
+     break;
+     
+case 6: 
+     row=1;
+     col=2;
+     break;
+     
+case 7: 
+     row=1;
+     col=3;
+     break;
+     
+case 8: 
+     row=2;
+     col=0;
+     break;
+     
+case 9: 
+     row=2;
+     col=1;
+     break;
+     
+case 10: 
+     row=2;
+     col=2;
+     break;
+     
+case 11: 
+     row=2;
+     col=3;
+     break;
+     
+case 12: 
+     row=3;
+     col=0;
+     break;
+     
+     case 13: 
+     row=3;
+     col=1;
+     break;
+     
+     case 14: 
+     row=3;
+     col=2;
+     break;
+     
+     case 15: 
+     row=3;
+     col=3;
+     break;
+                                                            
+  }
+  
+for(int brightness=0;brightness<maxBrightness;brightness++){
+        setGroupOf3(row, col*3+1,brightness, brightness,brightness);
+        setGroupOf3(row,col*3,maxBrightness-brightness,maxBrightness-brightness,maxBrightness-brightness);
+       
+      delay(5);
+setGroupOf3(row,col,0,0,0);
+      }
+  
+  
+    showActiveNotes();
+       
+  
+  
      printCurrentPosition(position);
      printCurrentChannel();
      
