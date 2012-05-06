@@ -32,10 +32,10 @@ const bool ShiftMatrixPWM_invertRowOutputs = 1; // if invertOutputs is 1, output
 
 unsigned char maxBrightness = 63;
 unsigned char pwmFrequency = 60;
-int numColumnRegisters =3;
+int numColumnRegisters =4;
 int numRows=4;
 
-int numColumns = numColumnRegisters*4;
+int numColumns = numColumnRegisters*3;
 int numOutputs = numColumns*numRows;
 
 int j = 0;
@@ -47,6 +47,33 @@ DFR_Key keypad;
 int localKey = 0; 
 String keyString = "";
 
+// keypad 
+int sensorPin = A5;    // select the input pin for the potentiometer
+
+int sensorValue = 0;  // variable to store the value coming from the sensor
+
+
+static int KEY1_ARV = 19; 
+static int KEY2_ARV = 41; 
+static int KEY3_ARV = 61; 
+static int KEY4_ARV = 1000; 
+static int KEY5_ARV = 73; 
+static int KEY6_ARV = 140; 
+static int KEY7_ARV = 200; 
+static int KEY8_ARV = 254; 
+static int KEY9_ARV = 40; 
+static int KEY10_ARV = 80; 
+static int KEY11_ARV = 115; 
+static int KEY12_ARV = 149; 
+static int KEY13_ARV = 27; 
+static int KEY14_ARV = 54; 
+static int KEY15_ARV = 77; 
+static int KEY16_ARV = 104; 
+
+    int _threshold = 3;
+    int _curInput = 0;
+    
+    
 // Clock and Counter
 int runMode = 0;   
 int editMode = 0;
@@ -54,7 +81,7 @@ int editMode = 0;
 int pause = (int) (60000 / bpm) / 8;
 int position = 0;
 int bar_counter = 0;
-int tb = 15; // total bars
+int tb = 1; // total bars
 unsigned int tick_counter = 0;
 int tpb = 16; // ticks per bar
 int myposition = 0;
@@ -115,7 +142,9 @@ void setGroupOf3(int row, int start, int r, int g, int b){
 }
 
 void showActiveNotes(){ 
-setGroupOf3(0, 0, 155,12,120);
+  
+  
+  setGroupOf3(0, 0, 155,12,120);
    setGroupOf3(1, 3, 155,12,120);
    setGroupOf3(1, 9, 155,12,120);
     setGroupOf3(2, 3, 155,12,120);
@@ -137,8 +166,6 @@ void setup() {
   // setup keys
   keypad.setRate(1000);
  
-  
-  
   //Setup LED Matrix
   pinMode(ShiftMatrixPWM_columnLatchPin, OUTPUT); 
   pinMode(ShiftMatrixPWM_rowDataPin, OUTPUT); 
@@ -146,8 +173,6 @@ void setup() {
   pinMode(ShiftMatrixPWM_rowLatchPin, OUTPUT); 
  
   SPI.setBitOrder(LSBFIRST);
-  // SPI_CLOCK_DIV2 is only a tiny bit faster in sending out the last byte. 
-  // SPI transfer and calculations overlap for the other bytes.
   SPI.setClockDivider(SPI_CLOCK_DIV4); 
   SPI.begin(); 
 
@@ -169,7 +194,7 @@ void setup() {
     midimsg( 0xB0 | the_chan, 0x78, 0);
     midimsg( 0xB0 | the_chan, 0x7B, 0);
   }
-
+  showActiveNotes();
   // Setup Menu
   menuSetup(); 
   
@@ -189,11 +214,16 @@ void loop() {
   // First, deal with any Note Offs which need to be sent.
   check_noteoffs(tick_counter);
  
-   showActiveNotes();
+ 
   // Update current position in the bar, 0 -> 31
    if( runMode == 1){position = tick_counter % tpb;}
- 
- 
+ // check Keypad
+  int _curKey = checkPads();      
+  
+  if(_curKey != 0){
+    lcd.print(" kp: ");
+    lcd.print(_curKey);
+  }
    // check the keyboard 
   localKey = keypad.getKey();
   
@@ -442,11 +472,11 @@ void add_noteoff(byte note, byte chan, unsigned int time){
 }
 
 // Checks the noteoff arrays and sends appropriate noteoffs
-void check_noteoffs(unsigned int couter)
+void check_noteoffs(unsigned int counter)
 {
   for (int i = 0; i<noteoff_size; i++)
   {
-    if (noteoff_times[i] == tick_counter)
+    if (noteoff_times[i] == counter)
     {
       noteoff(noteoff_chans[i], noteoff_notes[i]);
       noteoff_times[i] = 0; // slot is now empty
@@ -556,5 +586,36 @@ void stopEdit(){
 
 void stopRun(){
  runMode = 0; 
+
+}
+
+int checkPads(){
+        
+  // read the value from the sensor:
+  _curInput = analogRead(sensorPin);
+  
+  if (_curInput > 0){ 
+
+    int _curKey = 0;
+   
+     if (_curInput > KEY1_ARV - _threshold && _curInput < KEY1_ARV + _threshold ) _curKey = 1;
+        else if (_curInput > KEY2_ARV - _threshold && _curInput < KEY2_ARV + _threshold ) _curKey = 2;
+        else if (_curInput > KEY3_ARV - _threshold && _curInput < KEY3_ARV + _threshold ) _curKey = 3;
+        else if (_curInput > KEY4_ARV - _threshold && _curInput < KEY4_ARV + _threshold ) _curKey = 4;
+        else if (_curInput > KEY5_ARV - _threshold && _curInput < KEY5_ARV + _threshold ) _curKey = 5;
+        else if (_curInput > KEY6_ARV - _threshold && _curInput < KEY6_ARV + _threshold ) _curKey = 6;
+        else if (_curInput > KEY7_ARV - _threshold && _curInput < KEY7_ARV + _threshold ) _curKey = 7;
+        else if (_curInput > KEY8_ARV - _threshold && _curInput < KEY8_ARV + _threshold ) _curKey = 8;
+        else if (_curInput > KEY9_ARV - _threshold && _curInput < KEY9_ARV + _threshold ) _curKey = 9;
+        else if (_curInput > KEY10_ARV - _threshold && _curInput < KEY10_ARV + _threshold ) _curKey = 10;
+        else if (_curInput > KEY11_ARV - _threshold && _curInput < KEY11_ARV + _threshold ) _curKey = 11;
+        else if (_curInput > KEY12_ARV - _threshold && _curInput < KEY12_ARV + _threshold ) _curKey = 12;
+        else if (_curInput > KEY13_ARV - _threshold && _curInput < KEY13_ARV + _threshold ) _curKey = 13;
+        else if (_curInput > KEY14_ARV - _threshold && _curInput < KEY14_ARV + _threshold ) _curKey = 14;
+        else if (_curInput > KEY15_ARV - _threshold && _curInput < KEY15_ARV + _threshold ) _curKey = 15;
+        else if (_curInput > KEY16_ARV - _threshold && _curInput < KEY16_ARV + _threshold ) _curKey = 16;
+
+ return _curKey;
+  }       
 
 }
