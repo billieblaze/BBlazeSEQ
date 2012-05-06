@@ -27,8 +27,8 @@ Libraries:
 
 ChangeLog:
 ==========
-
-* v0.3 - Integrate LED Matrix
-* v0.2 - LCD / Menu / Nav Buttons / Simple OS   
+* v0.4 - Integrate Keypad w/ a Voltage Divider to A5
+* v0.3 - Integrate LED Matrix (shiftPWMMatrix + 75hc595)
+* v0.2 - LCD / Menu / Nav Buttons / Simple OS   (sainSmart LCD / Keypad)
 * v0.1 - basic poc / find libraries
 
