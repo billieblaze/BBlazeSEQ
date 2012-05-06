@@ -1,5 +1,5 @@
 /*
-BBlazeSeq v0.3
+BBlazeSeq v0.4
 */
 
 #include "SPI.h"
@@ -14,7 +14,7 @@ BBlazeSeq v0.3
 #define  noteoff_size 32   // size of the noteoff arrays in memory
 #define  mask         0x80 // used for drum patterns. b10000000
 
-String version = "0.3";
+String version = "0.4";
 
 // Init shiftMatrixPWM LED Matrix
 
@@ -52,7 +52,6 @@ int sensorPin = A5;    // select the input pin for the potentiometer
 
 int sensorValue = 0;  // variable to store the value coming from the sensor
 
-
 static int KEY1_ARV = 19; 
 static int KEY2_ARV = 41; 
 static int KEY3_ARV = 61; 
@@ -70,10 +69,9 @@ static int KEY14_ARV = 54;
 static int KEY15_ARV = 77; 
 static int KEY16_ARV = 104; 
 
-    int _threshold = 3;
-    int _curInput = 0;
-    
-    
+int _threshold = 3;
+int _curInput = 0;
+      
 // Clock and Counter
 int runMode = 0;   
 int editMode = 0;
@@ -142,13 +140,11 @@ void setGroupOf3(int row, int start, int r, int g, int b){
 }
 
 void showActiveNotes(){ 
-  
-  
   setGroupOf3(0, 0, 155,12,120);
-   setGroupOf3(1, 3, 155,12,120);
-   setGroupOf3(1, 9, 155,12,120);
-    setGroupOf3(2, 3, 155,12,120);
-    setGroupOf3(3, 6, 155,12,120);  
+  setGroupOf3(1, 3, 155,12,120);
+  setGroupOf3(1, 9, 155,12,120);
+  setGroupOf3(2, 3, 155,12,120);
+  setGroupOf3(3, 6, 155,12,120);  
 }
 
 // SETUP                 
@@ -572,22 +568,11 @@ void editNextStep(){
       bar_counter++;
     }
 }
-void startEdit(){
-  editMode = 1;
-}
 
-void startRun(){
- runMode = 1; 
-}
-
-void stopEdit(){
-  editMode = 0;
-}
-
-void stopRun(){
- runMode = 0; 
-
-}
+void startEdit(){  editMode = 1;}
+void startRun(){ runMode = 1; }
+void stopEdit(){  editMode = 0;}
+void stopRun(){ runMode = 0; }
 
 int checkPads(){
         
@@ -615,7 +600,6 @@ int checkPads(){
         else if (_curInput > KEY15_ARV - _threshold && _curInput < KEY15_ARV + _threshold ) _curKey = 15;
         else if (_curInput > KEY16_ARV - _threshold && _curInput < KEY16_ARV + _threshold ) _curKey = 16;
 
- return _curKey;
+       return _curKey;
   }       
-
 }
