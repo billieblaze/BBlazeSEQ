@@ -38,9 +38,6 @@ BBlazeSeq v0.5
 #define  oct7  84
 
 
-
-
-
 String version = "0.5";
 
 // Init shiftMatrixPWM LED Matrix
@@ -105,11 +102,12 @@ int runMode = 0;
 int editMode = 0;
 int bpm = 128;
 
-int pause = (int) (60000 / bpm) / 16;
+int pause = (60000 / bpm) / 4;
+
 int position = 0;
 int bar_counter = 0;
 int tb = 1; // total bars
-unsigned int tick_counter = 0;
+int tick_counter = 0;
 int tpb = 16; // ticks per bar
 int myposition = 0;
 
@@ -117,46 +115,46 @@ boolean pattern[][3][16]  =
 {
   {
     {
-      1,1,1,0,1,0,0,0,1,0,1,0,1,0,0,0            }
+      1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0            }
     ,        // Note on / off
     {
-      40,45,45,0,50,0,0,0,60,0,60,0,70,0,0,0            }
+      C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3            }
     ,    // Note Number
     {
-      127,127,127,0,255,0,0,0,127,0,255,0,255,0,0,0            }  // Velocity
+      127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127           }  // Velocity
   }
   ,
   {
     {
       0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0            }
     ,        // Note on / off
-    {
-      40,0,0,0,50,0,0,0,60,0,0,0,70,0,0,0            }
+     {
+      C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3            }
     ,    // Note Number
     {
-      127,0,0,0,255,0,0,0,127,0,0,0,255,0,0,0            }  // Velocity
+      127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127           }  // Velocity
   }
   ,
   {
     {
       0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0            }
     ,        // Note on / off
-    {
-      40,0,0,0,50,0,0,0,60,0,0,0,70,0,0,0            }
+     {
+      C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3            }
     ,    // Note Number
     {
-      127,0,0,0,255,0,0,0,127,0,0,0,255,0,0,0            }  // Velocity
+      127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127           }  // Velocity
   }
   ,
   {
     {
       0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0            }
     ,        // Note on / off
-    {
-      40,0,0,0,50,0,0,0,60,0,0,0,70,0,0,0            }
+     {
+      C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3            }
     ,    // Note Number
     {
-      127,0,0,0,255,0,0,0,127,0,0,0,255,0,0,0            }  // Velocity
+      127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127           }  // Velocity
   }
   ,
 };
@@ -354,20 +352,13 @@ void loop() {
   // Keep track of time when loop started
   unsigned long start_time = millis();
 
-  // Update current position in the bar, 0 -> 31
-  if( runMode == 1){
-    position = tick_counter % tpb;
-  }
-
-
   // check Keypad
   int _curKey = checkPads();      
 
   if(_curKey != 0){
     if ( pattern[currentChannel][0][_curKey] ==  1){
       pattern[currentChannel][0][_curKey] = 0;   
-    } 
-    else  {
+    } else  {
       pattern[currentChannel][0][_curKey] = 1;  
     }
     showActiveNotes();
@@ -381,7 +372,6 @@ void loop() {
     if(runMode == 0 && editMode == 0){ 
       switch (localKey) {
       case 3: 
-        lcd.print('up');
         menu.moveUp(); 
         break;
       case 4: 
@@ -439,11 +429,21 @@ void loop() {
   }
 
   if (runMode == 0 && editMode == 1){ 
-    lcd.print("!"); 
+
     printCurrentPosition(position);
     printCurrentChannel();
-
-
+    
+    int noteOn = pattern[currentChannel][0][position];
+    int note = pattern[currentChannel][1][position];
+    int velocity = pattern[currentChannel][2][position];
+    
+    lcd.setCursor(4,1);
+    
+    lcd.print(noteOn);
+    lcd.print(" #:");
+    lcd.print(note);
+    lcd.print(" V:");
+    lcd.print(velocity);
 
   } 
   else if (runMode == 1 && editMode == 0){  
@@ -541,14 +541,16 @@ void loop() {
     int i;
 
     for(i =0; i <= channels; i++){
-      int noteOn = pattern[i][0][position];
-      int note = pattern[i][1][position];
-      int velocity = pattern[i][2][position];
+      int noteOn = pattern[i][0][tick_counter];
+      int note = pattern[i][1][tick_counter];
+      int velocity = pattern[i][2][tick_counter];
 
       if ( noteOn == 1 ) { 
+       
         noteon(i, note, velocity);
-       }    else{ 
-        noteoff(i, note);
+
+      } else {
+        noteoff(i, note); 
       }
     }
     setGroupOf3(row, col*3, 0,0,0);
@@ -558,7 +560,9 @@ void loop() {
     // TIMEKEEPING
     //-----------------------------------------------------------
     tick_counter++;
-
+    // Update current position in the bar, 0 -> 31
+    if( runMode == 1){  position = tick_counter % tpb; }
+  
     if (tick_counter % tpb == 0 && tick_counter != 0) // We have reached the end of the bar
     {
       bar_counter++;
@@ -570,9 +574,10 @@ void loop() {
         bar_counter = 0;
       }  
     }
+
     // Pause before next tick.
-    while (millis() < start_time + pause) {
-    } 
+   while (millis() < start_time + pause) { } 
+    
   }
 
 
