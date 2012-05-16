@@ -1,723 +1,406 @@
-/*
-BBlazeSeq v0.5
- */
+/*BBlazeSeq v0.6 */
 
+#include "constants.h"
+#include <Wire.h> 
 #include "SPI.h"
 #include "hsv2rgb.h"
-#include <avr/pgmspace.h>
-#include <MenuBackend.h>
-#include <LiquidCrystal.h>
+//#include <avr/pgmspace.h>
+#include <MIDI.h>
+#include <LiquidCrystal_I2C.h>
 #include <DFR_Key.h>
-#include "util.h"
+#include "config.h"
 
-#define  noteoff_size 32   // size of the noteoff arrays in memory
-#define  mask         0x80 // used for drum patterns. b10000000
-
-// MIDI notes
-#define  C   0
-#define  Cs  1
-#define  D   2
-#define  Ds  3
-#define  E   4
-#define  F   5
-#define  Fs  6
-#define  G   7
-#define  Gs  8
-#define  A   9
-#define  As  10
-#define  B   11
-
-// Octaves
-#define  oct0  0
-#define  oct1  12
-#define  oct2  24
-#define  oct3  36
-#define  oct4  48
-#define  oct5  60
-#define  oct6  72
-#define  oct7  84
-
-
-String version = "0.5";
-
-// Init shiftMatrixPWM LED Matrix
-
-//Data pin is MOSI (atmega168/328: pin 11. Mega: 51) 
-//Clock pin is SCK (atmega168/328: pin 13. Mega: 52)
-const int ShiftMatrixPWM_columnLatchPin=3;
-const int ShiftMatrixPWM_rowDataPin=A2;
-const int ShiftMatrixPWM_rowClockPin=A3;
-const int ShiftMatrixPWM_rowLatchPin=A4;
-
-const bool ShiftMatrixPWM_invertColumnOutputs = 0; // if invertColumnOutputs is 1, outputs will be active low. Usefull for common anode RGB led's.
-const bool ShiftMatrixPWM_invertRowOutputs = 1; // if invertOutputs is 1, outputs will be active low. Used for PNP transistors.
-
-#include <ShiftMatrixPWM.h>   // include ShiftMatrixPWM.h after setting the pins!
-
-unsigned char maxBrightness = 63;
-unsigned char pwmFrequency = 60;
-int numColumnRegisters =4;
-int numRows=4;
-
-int numColumns = numColumnRegisters*3;
-int numOutputs = numColumns*numRows;
-
-int j = 0;
-
-
-// LCD Keys
-LiquidCrystal lcd(8, 9, 4, 5, 6, 7); 
-DFR_Key keypad;
-int localKey = 0; 
-String keyString = "";
-
-// keypad 
-int sensorPin = A5;    // select the input pin for the potentiometer
-
-int sensorValue = 0;  // variable to store the value coming from the sensor
-
-static int KEY1_ARV = 19; 
-static int KEY2_ARV = 41; 
-static int KEY3_ARV = 61; 
-static int KEY4_ARV = 1000; 
-static int KEY5_ARV = 73; 
-static int KEY6_ARV = 140; 
-static int KEY7_ARV = 200; 
-static int KEY8_ARV = 254; 
-static int KEY9_ARV = 40; 
-static int KEY10_ARV = 80; 
-static int KEY11_ARV = 115; 
-static int KEY12_ARV = 149; 
-static int KEY13_ARV = 27; 
-static int KEY14_ARV = 54; 
-static int KEY15_ARV = 77; 
-static int KEY16_ARV = 104; 
-
-int _threshold = 3;
-int _curInput = 0;
-
-// Clock and Counter
-int channels = 4;
-int runMode = 0;   
-int editMode = 0;
-int bpm = 128;
-
-int pause = (60000 / bpm) / 4;
-
-int position = 0;
-int bar_counter = 0;
-int tb = 1; // total bars
-int tick_counter = 0;
-int tpb = 16; // ticks per bar
-int myposition = 0;
-
-boolean pattern[][3][16]  =  
+// Default Song Data
+boolean patternData[][3][32]  =  
 {
   {
-    {
-      1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0            }
-    ,        // Note on / off
-    {
-      C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3            }
-    ,    // Note Number
-    {
-      127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127           }  // Velocity
+    {      1,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0            } ,        // Note on / off
+    {      C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3            }    ,    // Note Number
+    {      127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127,127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127           }  // Velocity  }
   }
-  ,
-  {
-    {
-      0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0            }
-    ,        // Note on / off
-     {
-      C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3            }
-    ,    // Note Number
-    {
-      127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127           }  // Velocity
-  }
-  ,
-  {
-    {
-      0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0            }
-    ,        // Note on / off
-     {
-      C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3            }
-    ,    // Note Number
-    {
-      127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127           }  // Velocity
-  }
-  ,
-  {
-    {
-      0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0            }
-    ,        // Note on / off
-     {
-      C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3            }
-    ,    // Note Number
-    {
-      127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127           }  // Velocity
-  }
-  ,
 };
-
-// variables for tracking what is being viewed / edited in run mode
-int currentChannel = 0;  // which channel are we viewing?
-
-// Menu 
-MenuBackend menu = MenuBackend(menuUseEvent,menuChangeEvent);
-//beneath is list of menu items needed to build the menu
-MenuItem start = MenuItem("Run");
-MenuItem editSeq = MenuItem("Edit");
-MenuItem settings = MenuItem("Settings");
-MenuItem Channel = MenuItem("MIDI Channel");
-MenuItem BPM = MenuItem("BPM");
-
-//this function builds the menu and connects the correct items together
-void menuSetup()
-{
-  //add the file menu to the menu root
-  menu.getRoot().add(start); 
-  start.addAfter(editSeq); 
-  editSeq.addAfter(settings); 
-  //setup the settings menu item
-  settings.addRight(Channel);
-  //we want looping both up and down
-  Channel.addBefore(BPM);
-  Channel.addAfter(BPM);
-  BPM.addAfter(Channel);
-  //we want a left movement to pint to settings from anywhere
-  Channel.addLeft(settings);
-  BPM.addLeft(settings);
-  settings.addAfter(start);
-}
-
-// Here all use events are handled - This is where you define a behaviour for a menu item
-void menuUseEvent(MenuUseEvent used){  
-  if (used.item == start){ 
-    startRun(); 
-  }
-  if (used.item == editSeq){ 
-    startEdit();  
-  }
-}
-
-// Here we get a notification whenever the user changes the menu
-void menuChangeEvent(MenuChangeEvent changed){
-  lcd.clear();
-  lcd.print(changed.to.getName());
-}
-
+   unsigned int bytesVal[32] = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,};
+   
 //shiftPWM
-void setGroupOf3(int row, int start, int r, int g, int b){
-  ShiftMatrixPWM.SetOne(row, start, r);
-  ShiftMatrixPWM.SetOne(row, start+1, g);
-  ShiftMatrixPWM.SetOne(row, start+2, b);
-}
-
-void showActiveNotes(){ 
-  int i, row, col;
-  for( i=0; i < 16; i++ ) { 
-    if (pattern[currentChannel][0][i] == 1) { 
-      switch(i){  
-      case 0: 
-        row=0;
-        col=3; 
-        break;
-      case 1: 
-        row=1;
-        col=3;
-        break;
-      case 2: 
-        row=2;
-        col=3;
-        break;
-      case 3: 
-        row=3;
-        col=3;
-        break;
-
-      case 4: 
-        row=0;
-        col=2;
-        break;
-
-      case 5: 
-        row=1;
-        col=2;
-        break;
-
-      case 6: 
-        row=2;
-        col=2;
-        break;
-
-      case 7: 
-        row=3;
-        col=2;
-        break;
-
-      case 8: 
-        row=0;
-        col=1;
-        break;
-
-      case 9: 
-        row=1;
-        col=1;
-        break;
-
-      case 10: 
-        row=2;
-        col=1;
-        break;
-
-      case 11: 
-        row=3;
-        col=1;
-        break;
-
-      case 12: 
-        row=0;
-        col=0;
-        break;
-
-      case 13: 
-        row=1;
-        col=0;
-        break;
-
-      case 14: 
-        row=2;
-        col=0;
-        break;
-
-      case 15: 
-        row=3;
-        col=0;
-        break;
-
-      }
-      setGroupOf3(row, col*3, 255,0,255);
-
-    }
-  }
-
-}
-
-// SETUP                 
-void setup() { 
-
-  lcd.begin(16, 2);
-  lcd.clear();
-  lcd.print("bblazeSEQ v");
-  lcd.print(version);
-  delay(250);
-
-  lcd.setCursor(0,1);
-  lcd.print("Init...");
-
-  // setup keys
-  keypad.setRate(1000);
-
-  //Setup LED Matrix
-  pinMode(ShiftMatrixPWM_columnLatchPin, OUTPUT); 
+  #include <ShiftMatrixPWM.h>
+ 
+  void setupLEDMatrix(){
+  
+   //Setup LED Matrix
+   pinMode(ShiftMatrixPWM_columnLatchPin, OUTPUT); 
   pinMode(ShiftMatrixPWM_rowDataPin, OUTPUT); 
   pinMode(ShiftMatrixPWM_rowClockPin, OUTPUT); 
   pinMode(ShiftMatrixPWM_rowLatchPin, OUTPUT); 
-
+ 
   SPI.setBitOrder(LSBFIRST);
+  // SPI_CLOCK_DIV2 is only a tiny bit faster in sending out the last byte. 
+  // SPI transfer and calculations overlap for the other bytes.
   SPI.setClockDivider(SPI_CLOCK_DIV4); 
   SPI.begin(); 
 
   ShiftMatrixPWM.SetMatrixSize(numRows, numColumnRegisters);
   ShiftMatrixPWM.Start(pwmFrequency,maxBrightness);  
   ShiftMatrixPWM.SetAll(0);
+  delay(200);
+  ShiftMatrixPWM.SetAll(255);
+  delay(200);
+  ShiftMatrixPWM.SetAll(0);
+  
 
-  // Start Midi
-  Serial.begin(31250);
+  }
+  
+  void setGroupOf3(int row, int start, int r, int g, int b){
+    ShiftMatrixPWM.SetOne(row, start, r);
+    ShiftMatrixPWM.SetOne(row, start+1, g);
+    ShiftMatrixPWM.SetOne(row, start+2, b);
+  }
 
-  showActiveNotes();
-  // Setup Menu
-  menuSetup(); 
+
+// Setup
+void setup(){
+ 
+   lcd.init();                      // initialize the lcd 
+  lcd.backlight();
+  lcd.print("bblazeSEQ v" + version);
+  lcd.setCursor(0,1);
+  lcd.print("Init...");
+
+  keypad.setRate(1000);
+  setupLEDMatrix();  
+  setupKeypad();
+
+  delay(250);
 
   lcd.print("DONE");
-  delay(500);
+  delay(250);
+  lcd.clear();
+  MIDI.begin();
+  MIDI.setHandleStart(HandleStart);
+  MIDI.setHandleClock(HandleClock);
+  MIDI.setHandleStop(HandleStop);
+  MIDI.setHandleContinue(HandleStart);
 
-
-  // first menu page
-  menu.moveDown();   
 }
 
-void loop() { 
 
-  // Keep track of time when loop started
-  unsigned long start_time = millis();
+// MIDI Callbacks
+void HandleStart(){
+  MIDIClockCounter = 0;
+  tickCounter=0;
+  runSequencer = 1;
+}
 
-  // check Keypad
-  int _curKey = checkPads();      
+void HandleStop(){
+  runSequencer = 0;
+}
 
-  if(_curKey != 0){
-    if ( pattern[currentChannel][0][_curKey] ==  1){
-      pattern[currentChannel][0][_curKey] = 0;   
-    } else  {
-      pattern[currentChannel][0][_curKey] = 1;  
-    }
-    showActiveNotes();
-  }
-
-  // check the keyboard 
-  localKey = keypad.getKey();
-
-  if (localKey != SAMPLE_WAIT){
-
-    if(runMode == 0 && editMode == 0){ 
-      switch (localKey) {
-      case 3: 
-        menu.moveUp(); 
-        break;
-      case 4: 
-        menu.moveDown(); 
-        break;
-      case 5: 
-        menu.moveRight(); 
-        break;
-      case 2: 
-        menu.moveLeft(); 
-        break;
-      case 1: 
-        menu.use(); 
-        break;
-      }
-
+void HandleClock(){
+  if(  runSequencer == 1){
+    if (MIDIClockCounter == 0){
+      playNotes();
+      tickCounter++;
     } 
-    else if (runMode == 1 && editMode == 0){
-
-      switch (localKey) {
-      case 3: 
-        previousChannel(); 
-        break;                // up = prev channel
-      case 4: 
-        nextChannel(); 
-        break;              // down = next channel
-        // these will be to move to the next bar
-        //case 5: menu.moveRight(); break;
-        //case 2: menu.moveLeft(); break;
-      case 1: 
-        stopRun();  
-        break;  // Select button = STOP
-      }   
-    } 
-    else if ( runMode == 0 && editMode == 1){ 
-      switch (localKey) {
-      case 3: 
-        previousChannel(); 
-        break;                // up = prev channel
-      case 4: 
-        nextChannel(); 
-        break;              // down = next channel
-      case 5: 
-        editNextStep(); 
-        break;	
-      case 2: 
-        editPreviousStep(); 
-        break;
-      case 1: 
-        stopEdit();  
-        break;  // Select button = STOP       
-      } 
-    }
-
-  }
-
-  if (runMode == 0 && editMode == 1){ 
-
-    printCurrentPosition(position);
-    printCurrentChannel();
-    
-    int noteOn = pattern[currentChannel][0][position];
-    int note = pattern[currentChannel][1][position];
-    int velocity = pattern[currentChannel][2][position];
-    
-    lcd.setCursor(4,1);
-    
-    lcd.print(noteOn);
-    lcd.print(" #:");
-    lcd.print(note);
-    lcd.print(" V:");
-    lcd.print(velocity);
-
-  } 
-  else if (runMode == 1 && editMode == 0){  
-    int row, col;
-    switch(position){ 
-    case 0: 
-      row=0;
-      col=3; 
-      break;
-    case 1: 
-      row=1;
-      col=3;
-      break;
-    case 2: 
-      row=2;
-      col=3;
-      break;
-    case 3: 
-      row=3;
-      col=3;
-      break;
-
-    case 4: 
-      row=0;
-      col=2;
-      break;
-
-    case 5: 
-      row=1;
-      col=2;
-      break;
-
-    case 6: 
-      row=2;
-      col=2;
-      break;
-
-    case 7: 
-      row=3;
-      col=2;
-      break;
-
-    case 8: 
-      row=0;
-      col=1;
-      break;
-
-    case 9: 
-      row=1;
-      col=1;
-      break;
-
-    case 10: 
-      row=2;
-      col=1;
-      break;
-
-    case 11: 
-      row=3;
-      col=1;
-      break;
-
-    case 12: 
-      row=0;
-      col=0;
-      break;
-
-    case 13: 
-      row=1;
-      col=0;
-      break;
-
-    case 14: 
-      row=2;
-      col=0;
-      break;
-
-    case 15: 
-      row=3;
-      col=0;
-      break;
-
-    }
-
-
-    setGroupOf3(row,col*3,255,255,255);
-
-
-
-
-    printCurrentPosition(position);
-    printCurrentChannel();
-
-    //Process MELODIES
-    int i;
-
-    for(i =0; i <= channels; i++){
-      int noteOn = pattern[i][0][tick_counter];
-      int note = pattern[i][1][tick_counter];
-      int velocity = pattern[i][2][tick_counter];
-
-      if ( noteOn == 1 ) { 
-       
-        noteon(i, note, velocity);
-
-      } else {
-        noteoff(i, note); 
-      }
-    }
-    setGroupOf3(row, col*3, 0,0,0);
-
-    showActiveNotes();
-    //-----------------------------------------------------------
-    // TIMEKEEPING
-    //-----------------------------------------------------------
-    tick_counter++;
-    // Update current position in the bar, 0 -> 31
-    if( runMode == 1){  position = tick_counter % tpb; }
   
-    if (tick_counter % tpb == 0 && tick_counter != 0) // We have reached the end of the bar
-    {
-      bar_counter++;
-      tick_counter = 0;  
-      position = 0;
-
-
-      if (bar_counter % tb == 0 &&  bar_counter != 0){
-        bar_counter = 0;
-      }  
-    }
-
-    // Pause before next tick.
-   while (millis() < start_time + pause) { } 
-    
-  }
-
-
-}
-
-
-//-----------------------------------------------------------
-// MIDI message sending functions
-//-----------------------------------------------------------
-
-void noteon(byte channel, byte note, byte velocity) 
-{
-  midimsg( 0x90 | channel, note, velocity);
-}
-
-void noteoff(byte channel, byte note) 
-{
-  midimsg( 0x80 | channel, note, 0);
-}
-
-void program_change(byte channel, byte progno) 
-{
-  midimsg( 0xC0 | channel, progno);
-}
-
-// Three-byte MIDI message
-void midimsg(byte cmd, byte data1, byte data2) 
-{
-  Serial.write(byte(cmd));
-  Serial.write(byte(data1));
-  Serial.write(byte(data2));
-}
-
-// Two-byte MIDI message
-void midimsg(byte cmd, byte data1) 
-{
-  Serial.write(byte(cmd));
-  Serial.write(byte(data1));
-}
-
-
-// function for maneuvering the channels while running / editing
-
-void printCurrentChannel(){
-  lcd.setCursor(0,1);
-  lcd.print("Ch");
-  lcd.print(currentChannel+1);    
-}
-void printCurrentPosition(int myposition){
-  lcd.setCursor(0,0);  
-  lcd.print("Bar ");
-  lcd.print(bar_counter);
-  lcd.print(" Tick ");
-  lcd.print(myposition);
-  lcd.print("    ");
-}
-
-void previousChannel(){
-  if (currentChannel != 0){ 
-    currentChannel--; 
-    printCurrentChannel();
-    showActiveNotes();
-  }
-}
-
-void nextChannel(){ 
-  if (currentChannel <= channels){
-    currentChannel++;  
-    printCurrentChannel();
-    showActiveNotes();
-  }
-}
-
-void editPreviousStep(){
-  if (position > 0){ 
-    if ( position != 0 && bar_counter !=0){
-      position--;
+    MIDIClockCounter++;
+      
+    if(tickCounter == 32){ 
+      tickCounter=0;
     } 
-    else { 
-      bar_counter--;
-      position=16; 
-    }       
-
-    printCurrentPosition(position);
+  
+    if (MIDIClockCounter == 6){ 
+      MIDIClockCounter=0; 
+    }
   }
 }
 
-void editNextStep(){ 
+void playNotes(){
+int channel = 0;
+  //for(int channel=0; channel <= channels; channel++){
+    int noteOn = patternData[channel][0][tickCounter];
+    int note = patternData[channel][1][tickCounter];
+    int velocity = patternData[channel][2][tickCounter];
 
-  position++;   
-  printCurrentPosition(position);
+     MIDI.sendNoteOff( note,0,channel+1);
+    if ( noteOn == 1 ) { 
+      MIDI.sendNoteOn( note, velocity,channel+1);
+   }
+  //} 
+}
 
-  if ( position > tpb){ 
-    position=0;
-    bar_counter++;
+
+// Main Loop
+void loop(){
+  handleMIDI();
+  handleLCD();
+  handleKeypad();
+  handleMatrix();
+}
+
+
+// Main Loop Handlers
+void handleMIDI(){
+  if (MIDI.read()) {                    // Is there a MIDI message incoming ?
+    switch(MIDI.getType()) {		// Get the type of the message we caught
+    default:
+
+      break;
+    }
+  } 
+}
+
+void handleLCD(){
+  lcd.setCursor(0,0);
+  if( runSequencer == 1){
+
+    lcd.print("RUN");
+    lcd.print("-");
+    lcd.print(tickCounter);
+    lcd.print("   ");
+  } 
+  else { 
+    lcd.print("WAIT");
+  }
+
+}
+
+
+void setupKeypad(){
+pinMode(keypadOutputClockPin, OUTPUT); // make the clock pin an output
+  pinMode(keypadOutputDataPin , OUTPUT); // make the data pin an output
+
+
+
+    /* Initialize our digital pins...
+    */
+    pinMode(ploadPin, OUTPUT);
+    pinMode(clockPin, OUTPUT);
+    pinMode(dataPin, INPUT);
+
+    digitalWrite(clockPin, LOW);
+    digitalWrite(ploadPin, HIGH);  
+}
+
+void handleKeypad(){
+  
+   shiftOut(keypadOutputDataPin, keypadOutputClockPin, LSBFIRST,  254);
+   read_shift_regs(1);
+   shiftOut(keypadOutputDataPin, keypadOutputClockPin, LSBFIRST,  253);
+   read_shift_regs(2);
+   shiftOut(keypadOutputDataPin, keypadOutputClockPin, LSBFIRST,  251);
+   read_shift_regs(3);
+   shiftOut(keypadOutputDataPin, keypadOutputClockPin, LSBFIRST,  247);
+   read_shift_regs(4);
+}
+
+/* This function is essentially a "shift-in" routine reading the
+ * serial Data from the shift register chips and representing
+ * the state of those pins in an unsigned integer (or long).
+*/
+unsigned int read_shift_regs(int row)
+{
+    byte bitVal;
+   
+    int curPosition = 0;
+    
+    /* Trigger a parallel Load to latch the state of the data lines,*/
+    digitalWrite(ploadPin, LOW);
+    delayMicroseconds(PULSE_WIDTH_USEC);
+    digitalWrite(ploadPin, HIGH);
+
+    /* Loop to read each bit value from the serial out line     * of the SN74HC165N.    */
+
+    for(int i = 1; i <= DATA_WIDTH; i++)
+    {
+        bitVal = digitalRead(dataPin);
+        
+        switch(row){
+           case 1: 
+               switch(i){ 
+                 case 1:
+                   curPosition = 7;
+                    break;
+                 case 2:
+                   curPosition = 6;
+                    break;
+                 
+                 case 3:
+                   curPosition = 5;
+                    break;
+                 
+                 case 4:
+                   curPosition = 4;
+                    break;
+                 
+                 case 5:
+                   curPosition = 3;
+                    break;
+                 
+                 case 6:
+                   curPosition = 0;
+                    break;
+                 
+                 case 7:
+                   curPosition = 1;
+                    break;
+                 
+                 case 8:
+                   curPosition = 2;
+                    break;
+               }      
+             break;
+           
+           case 2:
+             switch(i){ 
+                 case 1:
+                   curPosition = 15;
+                    break;
+                 case 2:
+                   curPosition = 14;
+                    break;
+                 
+                 case 3:
+                   curPosition = 13;
+                    break;
+                 
+                 case 4:
+                   curPosition = 12;
+                    break;
+                 
+                 case 5:
+                   curPosition = 11;
+                    break;
+                 
+                 case 6:
+                   curPosition = 8;
+                    break;
+                 
+                 case 7:
+                   curPosition = 9;
+                    break;
+                 
+                 case 8:
+                   curPosition = 10;
+                    break;
+               }      
+           break;
+           
+           case 3:
+           switch(i){ 
+                 case 1:
+                   curPosition = 23;
+                    break;
+                 case 2:
+                   curPosition = 22;
+                    break;
+                 
+                 case 3:
+                   curPosition = 21;
+                    break;
+                 
+                 case 4:
+                   curPosition = 20;
+                    break;
+                 
+                 case 5:
+                   curPosition = 19;
+                    break;
+                 
+                 case 6:
+                   curPosition = 16;
+                    break;
+                 
+                 case 7:
+                   curPosition = 17;
+                    break;
+                 
+                 case 8:
+                   curPosition = 18;
+                    break;
+               }      
+           break;
+           
+           case 4:
+           switch(i){ 
+                 case 1:
+                   curPosition = 31;
+                    break;
+                 case 2:
+                   curPosition = 30;
+                    break;
+                 
+                 case 3:
+                   curPosition = 29;
+                    break;
+                 
+                 case 4:
+                   curPosition =28;
+                    break;
+                 
+                 case 5:
+                   curPosition = 27;
+                    break;
+                 
+                 case 6:
+                   curPosition = 24;
+                    break;
+                 
+                 case 7:
+                   curPosition = 25;
+                    break;
+                 
+                 case 8:
+                   curPosition = 26;
+                    break;
+               }      
+           break;
+           
+        }
+    
+     // update the pattern if something was pressed! 
+        if(bitVal == 0){
+         if ( patternData[currentChannel][0][curPosition] == 1){ 
+            patternData[currentChannel][0][curPosition] = 0;
+
+          } else { 
+            patternData[currentChannel][0][curPosition] = 1;
+          }
+          delay(100);
+        }
+       
+        
+        
+        /* Pulse the Clock (rising edge shifts the next bit).        */
+        digitalWrite(clockPin, HIGH);
+        delayMicroseconds(PULSE_WIDTH_USEC);
+        digitalWrite(clockPin, LOW);
   }
 }
 
-void startEdit(){  
-  editMode = 1;
+void handleMatrix(){
+  int i= 0;
+  
+  // clear the last position indicator 
+  setGroupOf3(lastRow, lastCol*3, 0,0,0);
+  
+  // loop thru the grid
+  for(int row=0;row<numRows;row++){
+    for(int col=0;col<(numColumns/3);col++){
+       // currently selected notes
+       if (patternData[currentChannel][0][i] == 1) {     
+          setGroupOf3(row, col*3, 255,255,255);
+       } else { 
+           setGroupOf3(row, col*3, 0,0,0);
+       }
+      
+      // current song positon
+       if ( i == tickCounter){
+           lastRow = row;
+           lastCol = col;   
+          setGroupOf3(row, col*3, 255,0,255);
+       }
+       
+       i++;
+      
+    }
+  }
 }
-void startRun(){ 
-  runMode = 1; 
-}
-void stopEdit(){  
-  editMode = 0;
-}
-void stopRun(){ 
-  runMode = 0; 
-}
-
-int checkPads(){
-
-  // read the value from the sensor:
-  _curInput = analogRead(sensorPin);
-
-  if (_curInput > 0){ 
-
-    int _curKey = 0;
-
-    if (_curInput > KEY1_ARV - _threshold && _curInput < KEY1_ARV + _threshold ) _curKey = 1;
-    else if (_curInput > KEY2_ARV - _threshold && _curInput < KEY2_ARV + _threshold ) _curKey = 2;
-    else if (_curInput > KEY3_ARV - _threshold && _curInput < KEY3_ARV + _threshold ) _curKey = 3;
-    else if (_curInput > KEY4_ARV - _threshold && _curInput < KEY4_ARV + _threshold ) _curKey = 4;
-    else if (_curInput > KEY5_ARV - _threshold && _curInput < KEY5_ARV + _threshold ) _curKey = 5;
-    else if (_curInput > KEY6_ARV - _threshold && _curInput < KEY6_ARV + _threshold ) _curKey = 6;
-    else if (_curInput > KEY7_ARV - _threshold && _curInput < KEY7_ARV + _threshold ) _curKey = 7;
-    else if (_curInput > KEY8_ARV - _threshold && _curInput < KEY8_ARV + _threshold ) _curKey = 8;
-    else if (_curInput > KEY9_ARV - _threshold && _curInput < KEY9_ARV + _threshold ) _curKey = 9;
-    else if (_curInput > KEY10_ARV - _threshold && _curInput < KEY10_ARV + _threshold ) _curKey = 10;
-    else if (_curInput > KEY11_ARV - _threshold && _curInput < KEY11_ARV + _threshold ) _curKey = 11;
-    else if (_curInput > KEY12_ARV - _threshold && _curInput < KEY12_ARV + _threshold ) _curKey = 12;
-    else if (_curInput > KEY13_ARV - _threshold && _curInput < KEY13_ARV + _threshold ) _curKey = 13;
-    else if (_curInput > KEY14_ARV - _threshold && _curInput < KEY14_ARV + _threshold ) _curKey = 14;
-    else if (_curInput > KEY15_ARV - _threshold && _curInput < KEY15_ARV + _threshold ) _curKey = 15;
-    else if (_curInput > KEY16_ARV - _threshold && _curInput < KEY16_ARV + _threshold ) _curKey = 16;
-
-    return _curKey;
-  }       
-}
-
-
-
