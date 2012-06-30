@@ -9,24 +9,41 @@ This is my first Arduino Project, but not my first microcontroller project.
 Platform: 
 =========
 
-* SainSmart Arduino Uno clone
-* SainSmart 16x2 LCD + Keypad Shield (will later switch to serial LCD)
-* Custom MIDI board w/ basic MIDI IN / MIDI OUT (6n139)
+* SainSmart Arduino Mega 2560 clone
+* SainSmart i2c LCD
+* MIDI IN / MIDI OUT (6n139)
 * MicroChip 24LC256 - 256k RAM 
-* SparkFun 4x4 RGB LED / Button Matrix 
+* SparkFun 4x4 RGB LED / Button Matrix - 74hc595 shift registers for LED - 74hc164/165 for button matrix
 
+* Navigation 
+    - using a digital in module from Midibox.org - but again, just some 74hc595
+    * 8 rotary encoder / swithces 
+    * 5 nav buttons
+    * pattern change rotary/encoder
 
 Libraries:
 ==========
 
-* SainSmart LCD / Keypad Library
+* SainSmart i2c LCD
 * ShiftMatrixPWM
-* MIDI (tho, I'm going to check out Tymms MIDI lib, it's event based!)
-* Potentially a Timer (1 or 2?) 
+* MIDI 
+* Timer3 
+
+
+Roadmap: 
+========
+
+* create UI for encoder / switch combos
+* add save / clear / copy pattern
+* allow CC data in the pattern
+* PCB Design
 
 
 ChangeLog:
 ==========
+* v0.8 - Added 24LC256 - working on timing of UI routines - added "record+keyboard" mode
+* v0.7 - moved the button handling to an interrupt and added "updateLCD" flag which will update on the next loop()
+* v0.6 - switch to i2c LCD and arduino mega 2560
 * v0.5 - Replace sequence array that come from Cahors / buttons now toggle notes in the array
 * v0.4 - Integrate Keypad w/ a Voltage Divider to A5
 * v0.3 - Integrate LED Matrix (shiftPWMMatrix + 75hc595)
