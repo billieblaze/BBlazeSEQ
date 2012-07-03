@@ -28,7 +28,7 @@ void setup(){
   setupKeypad();
   setupMIDI();
   lcd.clear();
- // handleLCD();
+  handleLCD();
 
   // start the keypad scanning
   Timer3.initialize(200000); 

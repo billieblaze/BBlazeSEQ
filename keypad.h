@@ -75,19 +75,20 @@ void scanKeypad(){
  
   
 void handleKeypad(){
-  int bitVal;
+  int bitVal = 0;
   
   
   for (int row = 0; row <=3;  row++){
     if (newKeyPadValues[row] != oldKeyPadValues[row]){
      
       lcd.clear();
-    
-        for (byte mask = 00000001; mask>0; mask <<= 1) {
-          
-          if (newKeyPadValues[row] & mask){ bitVal = 1; }
+      int i = 0;
+        for (byte mask = 10000000; mask>0; mask >>= 1) {
+          bitVal = 0;
+          if (~newKeyPadValues[row] & mask){ bitVal = 1; }
          
           curPosition = buttonMapping[row][i];
+          i++;
 
         switch(editMode){ 
           
