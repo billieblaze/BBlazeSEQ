@@ -1,4 +1,4 @@
-String version = "0.8";
+String version = "0.9";
 
 int initialized = 0;
 
@@ -14,7 +14,7 @@ int initialized = 0;
     
     const bool ShiftMatrixPWM_invertColumnOutputs = 0; // if invertColumnOutputs is 1, outputs will be active low. Usefull for common anode RGB led's.
     const bool ShiftMatrixPWM_invertRowOutputs = 1; // if invertOutputs is 1, outputs will be active low. Used for PNP transistors.
-    unsigned char maxBrightness = 30;
+    unsigned char maxBrightness = 0;
     unsigned char pwmFrequency = 50;
     
     int numColumnRegisters = 3;
@@ -68,14 +68,9 @@ int initialized = 0;
     int dataPin         = A10; // Connects to the Q7 pin the 165
     int clockPin        = A12; // Connects to the Clock pin the 165
     
-    unsigned int pinValues_1;
-    unsigned int pinValues_2;
-    unsigned int pinValues_3;
-    unsigned int pinValues_4;
-    unsigned int oldPinValues_1;
-    unsigned int oldPinValues_2;
-    unsigned int oldPinValues_3;
-    unsigned int oldPinValues_4;
+    byte oldKeyPadValues[]={255,255,255,255};
+    byte newKeyPadValues[]={255,255,255,255};
+
 
 // navigation keys 
 int navploadPin        = 26;  // Connects to Parallel load pin the 165
@@ -85,7 +80,7 @@ int navclockPin        = 24; // Connects to the Clock pin the 165
 byte navKeyState;
 
 // Clock and Counter - all the bits the sequencer uses to track position / time / etc
-    int channels = 4;
+    int channels = 2;
     int currentChannel = 0;  // which channel are we viewing?
     int currentStep = 0;
     int MIDIClockCounter = 0;
@@ -100,3 +95,64 @@ byte navKeyState;
     int recordLastPosition = 0;
     int curPosition = 0;
     int keyOctave = 3;
+    
+    // Default Song Data
+boolean patternData[][5][32]  =  
+{
+  {
+    {      
+      1,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0                } 
+    ,        // Note on / off
+    {      
+      C+oct3,C+oct3,C+oct3,C+oct3,  C+oct3,C+oct3,C+oct3,C+oct3,  C+oct3,C+oct3,C+oct3,C+oct3,  C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3                }    
+    ,    // Note Number
+    {      
+      127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127,127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127               }
+    ,  // Velocity  
+    {   10     } // config  - first is patch number
+  }
+  ,
+  {
+    {      
+      0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0                } 
+    ,        // Note on / off
+    {      
+      C+oct3,C+oct3,C+oct3,C+oct3,  C+oct3,C+oct3,C+oct3,C+oct3,  C+oct3,C+oct3,C+oct3,C+oct3,  C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3                }    
+    ,    // Note Number
+    {      
+      127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127,127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127               }
+    ,  // Velocity  
+    {   
+      0     } // config  
+  }
+  ,
+  {
+    {      
+      0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0                } 
+    ,        // Note on / off
+    {      
+      C+oct3,C+oct3,C+oct3,C+oct3,  C+oct3,C+oct3,C+oct3,C+oct3,  C+oct3,C+oct3,C+oct3,C+oct3,  C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3                }    
+    ,    // Note Number
+    {      
+      127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127,127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127               }
+    ,  // Velocity  
+    {   
+      0     } // config  
+  }
+  ,
+  {
+    {      
+      0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0                } 
+    ,        // Note on / off
+    {      
+      C+oct3,C+oct3,C+oct3,C+oct3,  C+oct3,C+oct3,C+oct3,C+oct3,  C+oct3,C+oct3,C+oct3,C+oct3,  C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3,C+oct3                }    
+    ,    // Note Number
+    {      
+      127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127,127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127               }
+    ,  // Velocity  
+    {  
+      0      } // config  
+  }
+  ,  
+};
+
