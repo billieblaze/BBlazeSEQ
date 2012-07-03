@@ -41,6 +41,8 @@ Roadmap:
 
 ChangeLog:
 ==========
+
+* v0.9 - Split core .ino file into packages (lcd, keypad, matrix, etc) - working on timing (might remove interrupt) and general cleanup of UI handlers
 * v0.8 - Added 24LC256 - working on timing of UI routines - added "record+keyboard" mode
 * v0.7 - moved the button handling to an interrupt and added "updateLCD" flag which will update on the next loop()
 * v0.6 - switch to i2c LCD and arduino mega 2560
