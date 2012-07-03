@@ -33,7 +33,6 @@ Libraries:
 Roadmap: 
 ========
 
-* create UI for encoder / switch combos
 * add save / clear / copy pattern
 * allow CC data in the pattern
 * PCB Design
