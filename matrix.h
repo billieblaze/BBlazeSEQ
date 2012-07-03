@@ -1,4 +1,10 @@
 
+void setGroupOf3(int row, int start, int r, int g, int b){
+  ShiftMatrixPWM.SetOne(row, start, r);
+  ShiftMatrixPWM.SetOne(row, start+1, g);
+  ShiftMatrixPWM.SetOne(row, start+2, b);
+}
+
 void setupLEDMatrix(){
 
   //Setup LED Matrix
@@ -19,63 +25,49 @@ void setupLEDMatrix(){
   delay(200);
   ShiftMatrixPWM.SetAll(255);
   delay(200);
+  
   ShiftMatrixPWM.SetAll(0);
 }
-
-void setGroupOf3(int row, int start, int r, int g, int b){
-  ShiftMatrixPWM.SetOne(row, start, r);
-  ShiftMatrixPWM.SetOne(row, start+1, g);
-  ShiftMatrixPWM.SetOne(row, start+2, b);
-}
-
-
 
 void handleMatrix(){
   int i= 0;
 
-  // clear the last position indicator 
-  if ( runSequencer == 1){
-    setGroupOf3(lastRow, lastCol*3, 0,0,0);
-  }
   // loop thru the grid
   for(int row=0;row<numRows;row++){
     for(int col=0;col<(numColumns/3);col++){
-
+      int RED = 0;
+      int GREEN = 0;
+      int BLUE = 0;
+         
+     // selected notes  
       int currentNote = patternData[currentChannel][0][i];
-
-      // currently selected notes
-      if (currentNote == 0) { 
-        setGroupOf3(row, col*3, 0,0,0); 
-      }
-
+       
       if (currentNote == 1) {     
         if( i == 1 || i % 2 == 0){ 
-          setGroupOf3(row, col*3, 0,0,250);
-        } 
-        else { 
-          setGroupOf3(row, col*3, 10,0,200);
+            BLUE = 250;
+        } else { 
+            RED = 10;
+            BLUE = 200;
         }
       }
-
+      
       if (currentNote == 2){   // hold the note 
-        setGroupOf3(row, col*3, 10,0,150);
+          RED = 10;
+          BLUE = 150;
       }
-
+       
       // current song positon
       if ( i == tickCounter){
         lastRow = row;
         lastCol = col;   
-        setGroupOf3(row, col*3, 127,0,127);
+        setGroupOf3(lastRow, lastCol*3, 0,0,0);  
+        RED = 127;
+        BLUE = 127;
       }
 
-      // current step being edited
-      if( currentStep == i){
-        lastRow = row;
-        lastCol = col;   
-        setGroupOf3(row, col*3, 127,127,127);
-      }
+      setGroupOf3(row, col*3, RED, GREEN, BLUE);
+     
       i++;  
     }
   }
 }
-

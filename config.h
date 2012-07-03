@@ -14,8 +14,9 @@ int initialized = 0;
     
     const bool ShiftMatrixPWM_invertColumnOutputs = 0; // if invertColumnOutputs is 1, outputs will be active low. Usefull for common anode RGB led's.
     const bool ShiftMatrixPWM_invertRowOutputs = 1; // if invertOutputs is 1, outputs will be active low. Used for PNP transistors.
-    unsigned char maxBrightness = 0;
-    unsigned char pwmFrequency = 50;
+    
+    unsigned char maxBrightness = 63;
+    unsigned char pwmFrequency = 60;
     
     int numColumnRegisters = 3;
     int numRows=4;
@@ -56,7 +57,7 @@ int initialized = 0;
     
     /* Width of pulse to trigger the shift register to read and latch.
     */
-    #define PULSE_WIDTH_USEC   5
+    #define PULSE_WIDTH_USEC   3
     
     /* Optional delay between shift register reads.
     */
@@ -77,18 +78,22 @@ int navploadPin        = 26;  // Connects to Parallel load pin the 165
 int navdataPin         = 22; // Connects to the Q7 pin the 165
 int navclockPin        = 24; // Connects to the Clock pin the 165
 
-byte navKeyState;
+
+
+    byte oldNavKeyValues[]={255,255,255,255};
+    byte newNavKeyValues[]={255,255,255,255};
 
 // Clock and Counter - all the bits the sequencer uses to track position / time / etc
     int channels = 2;
     int currentChannel = 0;  // which channel are we viewing?
     int currentStep = 0;
+
     int MIDIClockCounter = 0;
     int tickCounter = 0;
     int runSequencer=0;
     int editMode=0;
     int editParam=0;
-    int updateLCD = 0;
+    int updateLCD = 1;
 
     int lastNote[4] = {0,0,0,0};
     int recordLastNote = 0;

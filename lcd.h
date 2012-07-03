@@ -7,64 +7,65 @@ void setupLCD(){
 }
 
 void handleLCD(){
- lcd.home();
-  lcd.print("CH");
+ if (updateLCD == 1){
+  // row 1
+  lcd.setCursor(0,0);
+  lcd.print("Chan ");
+  lcd.print("Step ");
+  lcd.print("Mode ");
+  lcd.print("Ptch ");
+  
+  
+  // row 2
+  
+  lcd.setCursor(0,1);
   lcd.print(currentChannel+1);
-  lcd.print(" - Step " +currentStep);
-  lcd.print(" ");
+  lcd.print("     ");
+  
+  lcd.print(currentStep);
+  lcd.print("   ");
 
   if (editMode == 0){
-    lcd.print("PLAY");
+    lcd.print("Play  ");
   }
 
   if (editMode == 1){
-    lcd.print("EDIT");
+    lcd.print("Edit  ");
   }
 
   if (editMode == 2){
-    lcd.print("REC ");
+    lcd.print("Rec   ");
   }
+  lcd.print(patternData[currentChannel][3][0]);
+  lcd.print("  ");
 
-  lcd.setCursor(0,1);
-  lcd.print("ON:");
-  if(editParam == 0){
-    lcd.print(">");
-  }
-
-
+  // row 3
+  lcd.setCursor(0,2);
+ 
+  lcd.print("Note ");
+  lcd.print("NNum ");
+  lcd.print("Velo ");
+  lcd.print("     ");
+  lcd.setCursor(0,3);
   int noteOnData = patternData[currentChannel][0][currentStep];
   switch(noteOnData){
-  case 0:
-    lcd.print("off");
-    break;
-  case 1:
-    lcd.print("on");
-    break;
-  case 2:
-    lcd.print("hld");
-    break;
-
+    case 0:
+      lcd.print("off   ");
+      break;
+    case 1:
+      lcd.print("on    ");
+      break;
+    case 2:
+      lcd.print("hld   ");
+      break;
   }
 
-  lcd.print(" N#:");
-  if(editParam == 1){
-    lcd.print(">");
-  }
   lcd.print(patternData[currentChannel][1][currentStep]);
+  lcd.print("   ");
 
-  lcd.print(" V:");
-  if(editParam == 2){
-    lcd.print(">");
-  }
   lcd.print(patternData[currentChannel][2][currentStep]);
   lcd.print(" ");
-
-  lcd.setCursor(0,2);
-
-  if(editParam == 3){
-    lcd.print(">");
-  }
-  lcd.print("Patch ");
-  lcd.print(patternData[currentChannel][3][0]);
+  updateLCD = 0;
+ }
 }
 

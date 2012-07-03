@@ -2,8 +2,6 @@
 
 // TODO: redo bottom button column connector! 
 // TODO: create / save(pattern knob button) multiple patterns - calculate out the storage requirements for such data and how many patterns i could hold 
-// TODO:  integrate control knobs and rework the ui for modifying params
-
 // TODO: allow CC data in the pattern - maybe just filter initially? 
 
 #include "constants.h"
@@ -27,11 +25,12 @@ void setup(){
   setupLEDMatrix(); 
   setupKeypad();
   setupMIDI();
-  lcd.clear();
-  handleLCD();
 
+  handleLCD();
+  handleMatrix();
+  
   // start the keypad scanning
-  Timer3.initialize(200000); 
+  Timer3.initialize(180000); 
   Timer3.attachInterrupt( pollUI ); 
     
 }
@@ -40,16 +39,15 @@ void setup(){
 void loop(){
 
   MIDI.read();
+  
+  handleNavKeys();
   handleKeypad();
   handleMatrix();
-  
-  if (updateLCD == 1){
-    handleLCD();
-    updateLCD = 0;
-  }
+  handleLCD();
+   
 }
 
 void pollUI(){
+  scanNavKeys(); 
   scanKeypad();
-  handleNavKeys(); 
 }

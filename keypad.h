@@ -78,23 +78,24 @@ void handleKeypad(){
   int bitVal = 0;
   
   
-  for (int row = 0; row <=3;  row++){
+  for (int row = 0; row < 4;  row++){
     if (newKeyPadValues[row] != oldKeyPadValues[row]){
-     
-      lcd.clear();
+      oldKeyPadValues[row] = newKeyPadValues[row];
       int i = 0;
-        for (byte mask = 10000000; mask>0; mask >>= 1) {
+      for (byte mask = 10000000; mask>0; mask >>= 1) {
           bitVal = 0;
-          if (~newKeyPadValues[row] & mask){ bitVal = 1; }
-         
-          curPosition = buttonMapping[row][i];
-          i++;
-
+          
+          if (~newKeyPadValues[row] & mask){ 
+            bitVal = 1;
+            curPosition = buttonMapping[row][i];
+          }
+      
         switch(editMode){ 
           
           case 0: // play
             
             if ( bitVal == 1){ // button pressed
+              currentStep = curPosition; 
               if ( patternData[currentChannel][0][curPosition] == 1){ 
                 patternData[currentChannel][0][curPosition] = 0;
               } else { 
@@ -108,7 +109,7 @@ void handleKeypad(){
           case 1: // edit
           
             if ( bitVal == 1){
-              currentStep = curPosition;
+              currentStep = curPosition; 
               updateLCD=1; 
             }
             
@@ -134,6 +135,8 @@ void handleKeypad(){
                     recordLastPosition = i;   
                 } 
             } else { // released button
+            
+            //NEED TO MOVE THIS - RELEASE NOTE IS NOT FIRING! 
               if ( recordLastNote == curPosition && recordLastPosition == i) {     
                  MIDI.sendNoteOff(recordLastNote+oct3,0,currentChannel +1);  
                  patternData[currentChannel][0][tickCounter] = 0;
@@ -147,7 +150,9 @@ void handleKeypad(){
   
         } 
         
-        oldKeyPadValues[row] = newKeyPadValues[row];
+        updateLCD = 1;
+         i++;
+
       } 
     }
   } 
