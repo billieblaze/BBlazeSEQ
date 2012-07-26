@@ -21,11 +21,6 @@ void setupKeypad(){
 
 
 
-/* This function is essentially a "shift-in" routine reading the
- * serial Data from the shift register chips and representing
- * the state of those pins in an unsigned integer (or long).
- */
- 
 byte read_shift_regs(int row){
   byte bitVal;
   byte bytesVal;
@@ -38,16 +33,12 @@ byte read_shift_regs(int row){
     /* Loop to read each bit value from the serial out line
      * of the SN74HC165N.
     */
-    for(int i = 0; i < DATA_WIDTH; i++)
-    {
-        bitVal = digitalRead(dataPin);
+    for(int i = 0; i < 8; i++)
+    { 
+        bitVal = digitalRead(dataPin);  // todo: convert to direct read of pin
+        bytesVal |= (bitVal << (7 - i));
 
-        /* Set the corresponding bit in bytesVal.*/
-        bytesVal |= (bitVal << ((DATA_WIDTH-1) - i));
-
-        /* Pulse the Clock (rising edge shifts the next bit).*/
         digitalWrite(clockPin, HIGH);
-        delayMicroseconds(PULSE_WIDTH_USEC);
         digitalWrite(clockPin, LOW);
     }
 
@@ -73,6 +64,7 @@ void scanKeypad(){
  
  
  
+  // TODO: bitmath? 
   
 void handleKeypad(){
   int bitVal = 0;

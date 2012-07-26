@@ -71,6 +71,6 @@ void setupMIDI(){
   MIDI.setHandleClock(HandleClock);
   MIDI.setHandleStop(HandleStop);
   MIDI.setHandleContinue(HandleStart);
-  MIDI.turnThruOff();  
+ // MIDI.turnThruOff();  
 }
 

@@ -2,9 +2,11 @@ String version = "0.9";
 
 int initialized = 0;
 
-// Init shiftMatrixPWM LED Matrix
 
-// ShiftMatrixPWM connects to a group of 3 daisy chained 74hc595's to control RGB (columns) and a seperate 74hc595 (rows)
+// LCD - using a sainSmart i2c LCD connected to 20/21 of my MEGA
+    LiquidCrystal_I2C lcd(0x27,20,4);  // set the LCD address to 0x27 for a 16 chars and 2 line display
+
+// ShiftMatrixPWM handles the led matrix and connects to a group of 3 daisy chained 74hc595's to control RGB (columns) and a seperate 74hc595 (rows)
   //Data pin is MOSI (atmega168/328: pin 11. Mega: 51) 
   //Clock pin is SCK (atmega168/328: pin 13. Mega: 52)
     const int ShiftMatrixPWM_columnLatchPin=49;
@@ -15,7 +17,7 @@ int initialized = 0;
     const bool ShiftMatrixPWM_invertColumnOutputs = 0; // if invertColumnOutputs is 1, outputs will be active low. Usefull for common anode RGB led's.
     const bool ShiftMatrixPWM_invertRowOutputs = 1; // if invertOutputs is 1, outputs will be active low. Used for PNP transistors.
     
-    unsigned char maxBrightness = 63;
+    unsigned char maxBrightness = 30;
     unsigned char pwmFrequency = 60;
     
     int numColumnRegisters = 3;
@@ -37,31 +39,18 @@ int initialized = 0;
     };
 
 
-// LCD - using a sainSmart i2c LCD connected to 20/21 of my MEGA
-    LiquidCrystal_I2C lcd(0x27,20,4);  // set the LCD address to 0x27 for a 16 chars and 2 line display
 
-
-// keypad 
-// The keypad connects to 74hc164 / 165 to shift in / out keys 
-    // shiftout 
+// The key matrix connect to 74hc164 / 165 to shift in / out keys 
     const int keypadOutputClockPin=A9;
     const int keypadOutputDataPin=A8;
     
-    /* How many shift register chips are daisy-chained.
-    */
-    #define NUMBER_OF_SHIFT_CHIPS   1
-    
-    /* Width of data (how many ext lines).
-    */
-    #define DATA_WIDTH   NUMBER_OF_SHIFT_CHIPS * 8
-    
     /* Width of pulse to trigger the shift register to read and latch.
     */
-    #define PULSE_WIDTH_USEC   3
+    #define PULSE_WIDTH_USEC   1
     
     /* Optional delay between shift register reads.
     */
-    #define POLL_DELAY_MSEC   1
+    #define POLL_DELAY_MSEC   0
     
     // shiftout
     
@@ -74,14 +63,45 @@ int initialized = 0;
 
 
 // navigation keys 
-int navploadPin        = 26;  // Connects to Parallel load pin the 165
-int navdataPin         = 22; // Connects to the Q7 pin the 165
-int navclockPin        = 24; // Connects to the Clock pin the 165
-
-
+    int navploadPin        = 26;  // Connects to Parallel load pin the 165
+    int navdataPin         = 22; // Connects to the Q7 pin the 165
+    int navclockPin        = 24; // Connects to the Clock pin the 165
 
     byte oldNavKeyValues[]={255,255,255,255};
     byte newNavKeyValues[]={255,255,255,255};
+
+    int encoderMapping[9][3] = {
+    // byte array row, then the actual bit (0,1) number position for that encoder
+      {0,2,3}, // ENC 1
+      {1,4,5}, // ENC 2
+      {2,7,6}, // ENC 3
+      {2,2,3}, // ENC 4
+      {0,5,6}, // ENC 5
+      {0,0,1}, // ENC 6
+      {1,1,2}, // ENC 7
+      {2,3,4}, // ENC 8
+      {3,1,2}, // ENC 9  - pattern knob
+    };
+    
+    int encoderButtonMapping[9] = {
+      0, // ENC_B 1
+      9, // ENC_B 2
+      15, // ENC_B 3
+      23, // ENC_B 4
+      8, // ENC_B 5
+      0, // ENC_B 6
+      12, // ENC_B 7
+      20, // ENC_B 8
+      31  // ENC_B 9
+    };
+    
+    int navButtonMapping[8] = {
+      27, // up
+      25, // down
+      28, // left
+      26, // right
+      25, // center
+    };
 
 // Clock and Counter - all the bits the sequencer uses to track position / time / etc
     int channels = 2;

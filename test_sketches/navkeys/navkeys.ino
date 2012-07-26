@@ -78,7 +78,7 @@ unsigned int read_shift_regs()
 lcd.setCursor(10,1);
 lcd.print(bytesVal);
 lcd.setCursor(10,2);
-lcd.print(65535-bytesVal);
+lcd.print(~bytesVal);
 
     return(bytesVal);
 }
