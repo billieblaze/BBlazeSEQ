@@ -19,14 +19,11 @@ void setupKeypad(){
   digitalWrite(navploadPin, HIGH);  
 }
 
-
-
 byte read_shift_regs(int row){
   byte bitVal;
   byte bytesVal;
 
   digitalWrite(ploadPin, LOW);
-  delayMicroseconds(PULSE_WIDTH_USEC);
   digitalWrite(ploadPin, HIGH);
   
 
@@ -36,9 +33,11 @@ byte read_shift_regs(int row){
     for(int i = 0; i < 8; i++)
     { 
         bitVal = digitalRead(dataPin);  // todo: convert to direct read of pin
+       // bitVal= PINK & ( B00000001 << PK2 );
         bytesVal |= (bitVal << (7 - i));
 
         digitalWrite(clockPin, HIGH);
+       
         digitalWrite(clockPin, LOW);
     }
 
@@ -61,14 +60,11 @@ void scanKeypad(){
   shiftOut(keypadOutputDataPin, keypadOutputClockPin, LSBFIRST,  253);
   newKeyPadValues[3] = read_shift_regs(4);
 }
- 
- 
- 
-  // TODO: bitmath? 
-  
+
+// TODO: bitmath? 
+
 void handleKeypad(){
   int bitVal = 0;
-  
   
   for (int row = 0; row < 4;  row++){
     if (newKeyPadValues[row] != oldKeyPadValues[row]){
@@ -142,7 +138,6 @@ void handleKeypad(){
   
         } 
         
-        updateLCD = 1;
          i++;
 
       } 

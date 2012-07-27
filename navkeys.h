@@ -40,6 +40,7 @@ void handleNavButtons(){
             case 24:// down  
               break;
             case 25:// Select
+            
               break;
             case 26:// Right
               break;
@@ -51,7 +52,7 @@ void handleNavButtons(){
               break;
             }
             
-          //  updateLCD = 1;  
+          updateLCD = 1;  
           }
           i++;
       }

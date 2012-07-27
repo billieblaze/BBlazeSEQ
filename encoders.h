@@ -82,65 +82,66 @@ void encoderChange( int encoder,int value){
 
 void handleEncoders(){
   if (newNavKeyValues != oldNavKeyValues){
-  
+
     for ( int i = 0; i < 10; i++){
-  
+
       int row = encoderMapping[i][0];
       int key1 = encoderMapping[i][1];
       int key2 = encoderMapping[i][2];
-      
+
       byte value1 = (~newNavKeyValues[row] >> key1) & B00000001;        
       byte value1_old = (~oldNavKeyValues[row] >> key1) & B00000001;
-    
+
       byte value2 = (~newNavKeyValues[row] >> key2) & B00000001;
       byte value2_old = (~oldNavKeyValues[row] >> key2) & B00000001;
-      
-      if (value1 != value1_old || value2 != value2_old){ 
-      
-  
-      if (value1_old == 0 && value1 == 0 &&  value2_old ==1 && value2 == 0 ) {
-        encoderChange(i,0); 
-  
-      }
-      
-       if (value1_old == 0 && value1 == 1 &&  value2_old ==0 && value2 == 0 ) {
-        encoderChange(i,0); 
-  
-      }
-   
-      
-       if (value1_old == 1 && value1 == 0 &&  value2_old ==1 && value2 == 1 ) {
-        encoderChange(i,0); 
-  
-      }
-      
-       if (value1_old == 1 && value1 == 1 &&  value2_old ==0 && value2 == 1 ) {
-        encoderChange(i,0); 
-  
-      }
-      
-      if (value1_old == 0 && value1 == 0 &&  value2_old ==0 && value2 == 1 ) {
-        encoderChange(i,1);
-   
-      }  
-      
-       if (value1_old == 0 && value1 == 1 &&  value2_old ==1 && value2 == 1 ) { 
-        encoderChange(i,1);
-    
-      }  
-     if (value1_old == 1 && value1 == 0 &&  value2_old ==0 && value2 == 0 ) { 
-        encoderChange(i,1);
-      
-      }  
-  
+
+     if (value1 != value1_old || value2 != value2_old){ 
+
+
+        if (value1_old == 0 && value1 == 0 &&  value2_old ==1 && value2 == 0 ) {
+          encoderChange(i,0); 
+
+        }
+
+        if (value1_old == 0 && value1 == 1 &&  value2_old ==0 && value2 == 0 ) {
+          encoderChange(i,0); 
+
+        }
+
+
+        if (value1_old == 1 && value1 == 0 &&  value2_old ==1 && value2 == 1 ) {
+          encoderChange(i,0); 
+
+        }
+
+        if (value1_old == 1 && value1 == 1 &&  value2_old ==0 && value2 == 1 ) {
+          encoderChange(i,0); 
+
+        }
+
+        if (value1_old == 0 && value1 == 0 &&  value2_old ==0 && value2 == 1 ) {
+          encoderChange(i,1);
+
+        }  
+
+        if (value1_old == 0 && value1 == 1 &&  value2_old ==1 && value2 == 1 ) { 
+          encoderChange(i,1);
+
+        }  
+        if (value1_old == 1 && value1 == 0 &&  value2_old ==0 && value2 == 0 ) { 
+          encoderChange(i,1);
+
+        }  
+
         if (value1_old == 1 && value1 == 1 &&  value2_old ==1 && value2 == 0 ) { 
-        encoderChange(i,1);
-     
-      }  
-      oldNavKeyValues[row] = newNavKeyValues[row];
-      
+          encoderChange(i,1);
+
+        }  
+        oldNavKeyValues[row] = newNavKeyValues[row];
+        updateLCD = 1;
+      }
+
     }
-    updateLCD = 1;  
-  }
   }
 }
+

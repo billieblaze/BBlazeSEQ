@@ -31,7 +31,7 @@ void HandleStart(){
   for(int channel=0; channel <= channels; channel++){
     MIDI.sendProgramChange(patternData[channel][3][0], channel+1);
   }
-
+updateMatrix=1;
 }
 
 void HandleStop(){  
@@ -45,6 +45,7 @@ void HandleClock(){
     // play notes every time the clock divider rolls over
     if (MIDIClockCounter == 0){
       playNotes();
+      updateMatrix=1;
       tickCounter++;
     } 
 

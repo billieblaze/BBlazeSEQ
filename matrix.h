@@ -16,7 +16,7 @@ void setupLEDMatrix(){
   SPI.setBitOrder(LSBFIRST);
   // SPI_CLOCK_DIV2 is only a tiny bit faster in sending out the last byte. 
   // SPI transfer and calculations overlap for the other bytes.
-  SPI.setClockDivider(SPI_CLOCK_DIV4); 
+  SPI.setClockDivider(SPI_CLOCK_DIV2); 
   SPI.begin(); 
 
   ShiftMatrixPWM.SetMatrixSize(numRows, numColumnRegisters);
@@ -31,7 +31,7 @@ void setupLEDMatrix(){
 
 void handleMatrix(){
   int i= 0;
-
+if (  updateMatrix == 1){
   // loop thru the grid
   for(int row=0;row<numRows;row++){
     for(int col=0;col<(numColumns/3);col++){
@@ -44,16 +44,16 @@ void handleMatrix(){
        
       if (currentNote == 1) {     
         if( i == 1 || i % 2 == 0){ 
-            BLUE = 250;
+            BLUE = 10;
         } else { 
             RED = 10;
-            BLUE = 200;
+            BLUE = 10;
         }
       }
       
       if (currentNote == 2){   // hold the note 
           RED = 10;
-          BLUE = 150;
+          BLUE = 5;
       }
        
       // current song positon
@@ -61,8 +61,8 @@ void handleMatrix(){
         lastRow = row;
         lastCol = col;   
         setGroupOf3(lastRow, lastCol*3, 0,0,0);  
-        RED = 127;
-        BLUE = 127;
+        RED = 10;
+        BLUE = 10;
       }
 
       setGroupOf3(row, col*3, RED, GREEN, BLUE);
@@ -70,4 +70,6 @@ void handleMatrix(){
       i++;  
     }
   }
+   updateMatrix = 0;
+}
 }

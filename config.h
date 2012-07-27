@@ -4,8 +4,11 @@ int initialized = 0;
 
 
 // LCD - using a sainSmart i2c LCD connected to 20/21 of my MEGA
-    LiquidCrystal_I2C lcd(0x27,20,4);  // set the LCD address to 0x27 for a 16 chars and 2 line display
-
+  LiquidCrystal_I2C lcd(0x27,20,4);  // set the LCD address to 0x27 for a 16 chars and 2 line display
+  
+  char* lcdData[4][4];
+  char* lcdData_old[4][4];
+  
 // ShiftMatrixPWM handles the led matrix and connects to a group of 3 daisy chained 74hc595's to control RGB (columns) and a seperate 74hc595 (rows)
   //Data pin is MOSI (atmega168/328: pin 11. Mega: 51) 
   //Clock pin is SCK (atmega168/328: pin 13. Mega: 52)
@@ -17,7 +20,7 @@ int initialized = 0;
     const bool ShiftMatrixPWM_invertColumnOutputs = 0; // if invertColumnOutputs is 1, outputs will be active low. Usefull for common anode RGB led's.
     const bool ShiftMatrixPWM_invertRowOutputs = 1; // if invertOutputs is 1, outputs will be active low. Used for PNP transistors.
     
-    unsigned char maxBrightness = 30;
+    unsigned char maxBrightness = 15;
     unsigned char pwmFrequency = 60;
     
     int numColumnRegisters = 3;
@@ -114,12 +117,21 @@ int initialized = 0;
     int editMode=0;
     int editParam=0;
     int updateLCD = 1;
+    int updateMatrix = 1;
+    
+
 
     int lastNote[4] = {0,0,0,0};
     int recordLastNote = 0;
     int recordLastPosition = 0;
     int curPosition = 0;
     int keyOctave = 3;
+
+    unsigned long LCDLastUpdated=0;
+    unsigned long UILastUpdated=0;
+    unsigned long startTime = 0;
+    unsigned long UICycleTime = 0;
+    unsigned long LCDCycleTime = 0;
     
     // Default Song Data
 boolean patternData[][5][32]  =  
