@@ -142,6 +142,7 @@ void handleKeypad(){
 
       } 
     }
-  } 
+  }  
+  updateMatrix = 1;
 }
 

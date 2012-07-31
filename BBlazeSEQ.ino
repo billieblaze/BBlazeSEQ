@@ -6,7 +6,8 @@
 // todo: check rotary 3 and 9
 
 #include "constants.h"
-#include <stdlib.h> 
+#include <stdio.h>
+#include <stdlib.h>
 #include <Wire.h>
 #include "SPI.h"
 #include "hsv2rgb.h"
@@ -27,6 +28,7 @@
 
 // Setup
 void setup(){
+  Serial.begin(9600);
   setupLCD();
   setupLEDMatrix(); 
   setupKeypad();
@@ -35,22 +37,19 @@ void setup(){
 
 // Main Loop
 void loop(){
+ startTime = millis();
 
   MIDI.read();
+ 
+  if(startTime % 2 == 0){ 
+     scanUI();  
+  }
+ 
   handleMatrix();
- scanUI();
-  if(millis() % 3 == 0){ 
-    updateLCDArray();
-    
-  }
+  handleUI();  
+  updateLCDArray();
 
-  if(millis() % 7 == 0){ 
-     scanKeypad();
-     handleUI(); 
+  if(startTime % 50 == 0){ 
+    writeToLCD();   
   }
-
-  if(millis() % 11 == 0){ 
-   writeToLCD();  
-  }
-
 }

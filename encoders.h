@@ -98,47 +98,48 @@ void handleEncoders(){
      if (value1 != value1_old || value2 != value2_old){ 
 
 
-        if (value1_old == 0 && value1 == 0 &&  value2_old ==1 && value2 == 0 ) {
+      /*  if (value1_old == 0 && value1 == 0 &&  value2_old ==1 && value2 == 0 ) {
           encoderChange(i,0); 
 
-        }
-
+        }*/
         if (value1_old == 0 && value1 == 1 &&  value2_old ==0 && value2 == 0 ) {
           encoderChange(i,0); 
 
         }
 
-
+/* 
         if (value1_old == 1 && value1 == 0 &&  value2_old ==1 && value2 == 1 ) {
           encoderChange(i,0); 
 
-        }
+        }*/
 
         if (value1_old == 1 && value1 == 1 &&  value2_old ==0 && value2 == 1 ) {
           encoderChange(i,0); 
 
         }
-
+/* 
         if (value1_old == 0 && value1 == 0 &&  value2_old ==0 && value2 == 1 ) {
           encoderChange(i,1);
 
-        }  
+        }  */
 
         if (value1_old == 0 && value1 == 1 &&  value2_old ==1 && value2 == 1 ) { 
           encoderChange(i,1);
 
         }  
+        /* 
         if (value1_old == 1 && value1 == 0 &&  value2_old ==0 && value2 == 0 ) { 
           encoderChange(i,1);
 
         }  
-
+*/
         if (value1_old == 1 && value1 == 1 &&  value2_old ==1 && value2 == 0 ) { 
           encoderChange(i,1);
 
         }  
         oldNavKeyValues[row] = newNavKeyValues[row];
         updateLCD = 1;
+        updateMatrix = 1;
       }
 
     }

@@ -1,3 +1,5 @@
+// I had to increase the freq of i2c in twi.h (inside wire library) to 300hz.  i also commented out the delays in there to try and tighten up the response
+
 void setupLCD(){
   lcd.init();                   
   lcd.backlight();
@@ -9,6 +11,11 @@ void setupLCD(){
 }
 
 void updateLCDArray(){
+char buffer1[255];
+char buffer2[255];
+char buffer3[255];
+char buffer4[255];
+char buffer5[255];
 
    if(updateLCD == 1){
 
@@ -20,8 +27,13 @@ void updateLCDArray(){
     
    
     // row 2
-    itoa(currentChannel+1, lcdData[1][0], 10);
-    itoa(currentStep, lcdData[1][1], 10);
+   sprintf(buffer1, "%d", currentChannel+1);
+   lcdData[1][0] = buffer1;
+   
+   
+   sprintf(buffer2, "%d", currentStep);
+   lcdData[1][1] = buffer2;
+ 
   
     if (editMode == 0){
      lcdData[1][2] = "Play";
@@ -35,10 +47,12 @@ void updateLCDArray(){
        lcdData[1][2] = "Rec ";
     }
     
-    itoa(patternData[currentChannel][3][0],lcdData[1][3], 10);
-  
+
+  sprintf(buffer3, "%d", patternData[currentChannel][3][0]);
+   lcdData[1][3] = buffer3;
+   
     // row 3
-    lcdData[2][0] = "NNum";
+    lcdData[2][0] = "Note";
     lcdData[2][1] = "NNum";
     lcdData[2][2] = "Velo";
     lcdData[2][3] = "    ";
@@ -56,25 +70,35 @@ void updateLCDArray(){
         lcdData[3][0] = "hld ";
         break;
     }
-  
-  itoa(patternData[currentChannel][1][currentStep], lcdData[3][1], 10);
-  itoa(patternData[currentChannel][2][currentStep], lcdData[3][2], 10);
-  
+     sprintf(buffer4, "%d", patternData[currentChannel][1][currentStep]);
+   lcdData[3][1] = buffer4;
+    sprintf(buffer5, "%d",patternData[currentChannel][2][currentStep]);
+   lcdData[3][2] = buffer5;
+   lcdData[3][3] = "";
+
   updateLCD = 0;
  }
 }
 
 void writeToLCD(){
- if(lcdData != lcdData_old){    
+  
     for ( int i = 0; i < 4; i++){ 
-      
-       StringSumHelper printIt=       String(lcdData[i][0]) + " " +       String(lcdData[i][1]) + " " +       String(lcdData[i][2]) + " " +       String(lcdData[i][3]) + " ";
+      if(lcdData[i] != lcdData_old[i]){   
+
        lcd.setCursor(0,i);
-       lcd.print(printIt);
-       lcdData_old[1][0] = lcdData[1][0];
-       lcdData_old[1][1] = lcdData[1][1];
-       lcdData_old[1][2] = lcdData[1][2];
-       lcdData_old[1][3] = lcdData[1][3];
+       
+       lcd.print(lcdData[i][0]);
+       lcd.setCursor(5,i);
+       lcd.print(lcdData[i][1]);
+       lcd.setCursor(10,i);
+       lcd.print(lcdData[i][2]);
+       lcd.setCursor(15,i);
+       lcd.print(lcdData[i][3]);
+          
+       lcdData_old[i][0] = lcdData[i][0];
+       lcdData_old[i][1] = lcdData[i][1];
+       lcdData_old[i][2] = lcdData[i][2];
+       lcdData_old[i][3] = lcdData[i][3];
     }
   }
   LCDLastUpdated = millis();

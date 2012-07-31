@@ -118,9 +118,7 @@ int initialized = 0;
     int editParam=0;
     int updateLCD = 1;
     int updateMatrix = 1;
-    
-
-
+   
     int lastNote[4] = {0,0,0,0};
     int recordLastNote = 0;
     int recordLastPosition = 0;
@@ -192,4 +190,3 @@ boolean patternData[][5][32]  =
   }
   ,  
 };
-
