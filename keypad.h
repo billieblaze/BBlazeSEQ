@@ -1,3 +1,8 @@
+    byte oldKeyPadValues[]={255,255,255,255};
+    byte newKeyPadValues[]={255,255,255,255};
+
+
+
 void setupKeypad(){
   // matrix keypad
   pinMode(keypadOutputClockPin, OUTPUT); // make the clock pin an output
@@ -23,8 +28,8 @@ byte read_shift_regs(int row){
   byte bitVal;
   byte bytesVal;
 
-  digitalWrite(ploadPin, LOW);
-  digitalWrite(ploadPin, HIGH);
+  digitalWriteFast(ploadPin, LOW);
+  digitalWriteFast(ploadPin, HIGH);
   
 
     /* Loop to read each bit value from the serial out line
@@ -32,13 +37,13 @@ byte read_shift_regs(int row){
     */
     for(int i = 0; i < 8; i++)
     { 
-        bitVal = digitalRead(dataPin);  // todo: convert to direct read of pin
+        bitVal = digitalReadFast(dataPin);  // todo: convert to direct read of pin
        // bitVal= PINK & ( B00000001 << PK2 );
         bytesVal |= (bitVal << (7 - i));
 
-        digitalWrite(clockPin, HIGH);
+        digitalWriteFast(clockPin, HIGH);
        
-        digitalWrite(clockPin, LOW);
+        digitalWriteFast(clockPin, LOW);
     }
 
     return(bytesVal);

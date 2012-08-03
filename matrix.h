@@ -22,11 +22,7 @@ void setupLEDMatrix(){
   ShiftMatrixPWM.SetMatrixSize(numRows, numColumnRegisters);
   ShiftMatrixPWM.Start(pwmFrequency,maxBrightness);  
   ShiftMatrixPWM.SetAll(0);
-  delay(200);
-  ShiftMatrixPWM.SetAll(255);
-  delay(200);
-  
-  ShiftMatrixPWM.SetAll(0);
+
 }
 
 void handleMatrix(){
@@ -43,12 +39,7 @@ if (  updateMatrix == 1){
       int currentNote = patternData[currentChannel][0][i];
        
       if (currentNote == 1) {     
-        if( i == 1 || i % 2 == 0){ 
             BLUE = 10;
-        } else { 
-            RED = 10;
-            BLUE = 10;
-        }
       }
       
       if (currentNote == 2){   // hold the note 
@@ -62,6 +53,7 @@ if (  updateMatrix == 1){
         lastCol = col;   
         setGroupOf3(lastRow, lastCol*3, 0,0,0);  
         RED = 10;
+        GREEN = 10;
         BLUE = 10;
       }
 

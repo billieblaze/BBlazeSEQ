@@ -8,27 +8,35 @@
 #include "constants.h"
 #include <stdio.h>
 #include <stdlib.h>
+
 #include <Wire.h>
+
 #include "SPI.h"
 #include "hsv2rgb.h"
 #include <MIDI.h>
 #include <LiquidCrystal_I2C.h>
+#include <digitalWriteFast.h>
 
 #include "config.h"
 #include <ShiftMatrixPWM.h> // included last because pins are declared in config.h
-#include "lcd.h"
-#include "matrix.h"
-#include "keypad.h"
-#include "encoders.h"
-#include "navkeys.h"
+
+
+
 #include "midi.h"
+
+#include "keypad.h"
+#include "navkeys.h"
+#include "encoders.h"
 #include "UI.h"
 
+
+#include "matrix.h"
+#include "lcd.h"
 
 
 // Setup
 void setup(){
-  Serial.begin(9600);
+  //Serial.begin(9600);
   setupLCD();
   setupLEDMatrix(); 
   setupKeypad();
@@ -48,8 +56,5 @@ void loop(){
   handleMatrix();
   handleUI();  
   updateLCDArray();
-
-  if(startTime % 50 == 0){ 
-    writeToLCD();   
-  }
+  writeToLCD();   
 }

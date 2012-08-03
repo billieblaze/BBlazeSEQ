@@ -1,14 +1,5 @@
 String version = "0.9";
 
-int initialized = 0;
-
-
-// LCD - using a sainSmart i2c LCD connected to 20/21 of my MEGA
-  LiquidCrystal_I2C lcd(0x27,20,4);  // set the LCD address to 0x27 for a 16 chars and 2 line display
-  
-  char* lcdData[4][4];
-  char* lcdData_old[4][4];
-  
 // ShiftMatrixPWM handles the led matrix and connects to a group of 3 daisy chained 74hc595's to control RGB (columns) and a seperate 74hc595 (rows)
   //Data pin is MOSI (atmega168/328: pin 11. Mega: 51) 
   //Clock pin is SCK (atmega168/328: pin 13. Mega: 52)
@@ -20,7 +11,7 @@ int initialized = 0;
     const bool ShiftMatrixPWM_invertColumnOutputs = 0; // if invertColumnOutputs is 1, outputs will be active low. Usefull for common anode RGB led's.
     const bool ShiftMatrixPWM_invertRowOutputs = 1; // if invertOutputs is 1, outputs will be active low. Used for PNP transistors.
     
-    unsigned char maxBrightness = 15;
+    unsigned char maxBrightness = 1;
     unsigned char pwmFrequency = 60;
     
     int numColumnRegisters = 3;
@@ -47,22 +38,11 @@ int initialized = 0;
     const int keypadOutputClockPin=A9;
     const int keypadOutputDataPin=A8;
     
-    /* Width of pulse to trigger the shift register to read and latch.
-    */
-    #define PULSE_WIDTH_USEC   1
-    
-    /* Optional delay between shift register reads.
-    */
-    #define POLL_DELAY_MSEC   0
-    
     // shiftout
-    
     int ploadPin        = A11;  // Connects to Parallel load pin the 165
     int dataPin         = A10; // Connects to the Q7 pin the 165
     int clockPin        = A12; // Connects to the Clock pin the 165
     
-    byte oldKeyPadValues[]={255,255,255,255};
-    byte newKeyPadValues[]={255,255,255,255};
 
 
 // navigation keys 
@@ -70,9 +50,7 @@ int initialized = 0;
     int navdataPin         = 22; // Connects to the Q7 pin the 165
     int navclockPin        = 24; // Connects to the Clock pin the 165
 
-    byte oldNavKeyValues[]={255,255,255,255};
-    byte newNavKeyValues[]={255,255,255,255};
-
+  
     int encoderMapping[9][3] = {
     // byte array row, then the actual bit (0,1) number position for that encoder
       {0,2,3}, // ENC 1
@@ -108,28 +86,17 @@ int initialized = 0;
 
 // Clock and Counter - all the bits the sequencer uses to track position / time / etc
     int channels = 2;
-    int currentChannel = 0;  // which channel are we viewing?
-    int currentStep = 0;
+          int updateMatrix = 1;
+        int updateLCD = 1;
+        
+          byte oldNavKeyValues[]={255,255,255,255};
+    byte newNavKeyValues[]={255,255,255,255};
 
-    int MIDIClockCounter = 0;
-    int tickCounter = 0;
-    int runSequencer=0;
-    int editMode=0;
-    int editParam=0;
-    int updateLCD = 1;
-    int updateMatrix = 1;
+
    
-    int lastNote[4] = {0,0,0,0};
-    int recordLastNote = 0;
-    int recordLastPosition = 0;
-    int curPosition = 0;
-    int keyOctave = 3;
-
-    unsigned long LCDLastUpdated=0;
     unsigned long UILastUpdated=0;
     unsigned long startTime = 0;
-    unsigned long UICycleTime = 0;
-    unsigned long LCDCycleTime = 0;
+
     
     // Default Song Data
 boolean patternData[][5][32]  =  

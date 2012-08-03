@@ -1,5 +1,22 @@
+ int MIDIClockCounter = 0;
+    int tickCounter = 0;
+    int runSequencer=0;
+    int editMode=0;
+    int editParam=0;
 
 
+  int currentChannel = 0;  // which channel are we viewing?
+    int currentStep = 0;
+
+   
+   
+   
+    int lastNote[4] = {0,0,0,0};
+    int recordLastNote = 0;
+    int recordLastPosition = 0;
+    int curPosition = 0;
+    int keyOctave = 3;
+    
 void playNotes(){
   for(int channel=0; channel <= channels; channel++){
     int noteOn = patternData[channel][0][tickCounter];
@@ -44,7 +61,7 @@ void HandleClock(){
 
     // play notes every time the clock divider rolls over
     if (MIDIClockCounter == 0){
-      playNotes();
+       playNotes();
       updateMatrix=1;
       tickCounter++;
     } 
