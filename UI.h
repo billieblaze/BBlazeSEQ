@@ -1,6 +1,3 @@
-
-
-
 void scanUI( ){
   byte bitVal;
   byte bytesVal;

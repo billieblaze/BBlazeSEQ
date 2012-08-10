@@ -1,7 +1,7 @@
 #include <Wire.h> 
 #include <LiquidCrystal_I2C.h>
 LiquidCrystal_I2C lcd(0x27,20,4);  // set the LCD address to 0x27 for a 16 chars and 2 line display
-
+#include <digitalWriteFast.h>
 
 // shiftout 
 const int keypadOutputClockPin=A9;
@@ -58,7 +58,7 @@ unsigned int read_shift_regs()
     */
     for(int i = 0; i < DATA_WIDTH; i++)
     {
-        bitVal = digitalRead(dataPin);
+        bitVal = digitalReadFast(dataPin);
     lcd.print(bitVal);
         /* Set the corresponding bit in bytesVal.
         */

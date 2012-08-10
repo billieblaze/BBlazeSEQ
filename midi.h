@@ -8,9 +8,7 @@
   int currentChannel = 0;  // which channel are we viewing?
     int currentStep = 0;
 
-   
-   
-   
+
     int lastNote[4] = {0,0,0,0};
     int recordLastNote = 0;
     int recordLastPosition = 0;
@@ -48,7 +46,7 @@ void HandleStart(){
   for(int channel=0; channel <= channels; channel++){
     MIDI.sendProgramChange(patternData[channel][3][0], channel+1);
   }
-updateMatrix=1;
+  updateMatrix=1;
 }
 
 void HandleStop(){  

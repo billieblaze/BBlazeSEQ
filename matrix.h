@@ -39,12 +39,12 @@ if (  updateMatrix == 1){
       int currentNote = patternData[currentChannel][0][i];
        
       if (currentNote == 1) {     
-            BLUE = 10;
+            BLUE = 1;
       }
       
       if (currentNote == 2){   // hold the note 
-          RED = 10;
-          BLUE = 5;
+          RED = 1;
+          BLUE = 1;
       }
        
       // current song positon
@@ -52,9 +52,9 @@ if (  updateMatrix == 1){
         lastRow = row;
         lastCol = col;   
         setGroupOf3(lastRow, lastCol*3, 0,0,0);  
-        RED = 10;
-        GREEN = 10;
-        BLUE = 10;
+        RED = 1;
+        GREEN = 1;
+        BLUE = 1;
       }
 
       setGroupOf3(row, col*3, RED, GREEN, BLUE);

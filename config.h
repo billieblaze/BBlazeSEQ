@@ -1,5 +1,8 @@
 String version = "0.9";
-
+ unsigned long LCDLastUpdated=0;
+// LCD - using a sainSmart i2c LCD connected to 20/21 of my MEGA
+  LiquidCrystal_I2C lcd(0x27,20,4);  // set the LCD address to 0x27 for a 16 chars and 2 line display
+  
 // ShiftMatrixPWM handles the led matrix and connects to a group of 3 daisy chained 74hc595's to control RGB (columns) and a seperate 74hc595 (rows)
   //Data pin is MOSI (atmega168/328: pin 11. Mega: 51) 
   //Clock pin is SCK (atmega168/328: pin 13. Mega: 52)
@@ -12,9 +15,9 @@ String version = "0.9";
     const bool ShiftMatrixPWM_invertRowOutputs = 1; // if invertOutputs is 1, outputs will be active low. Used for PNP transistors.
     
     unsigned char maxBrightness = 1;
-    unsigned char pwmFrequency = 60;
+    unsigned char pwmFrequency = 30;
     
-    int numColumnRegisters = 3;
+    int numColumnRegisters = 3; 
     int numRows=4;
     
     int numColumns = numColumnRegisters*8;
@@ -30,6 +33,7 @@ String version = "0.9";
       {7,6,5,4,3,0,1,2},
       {15,14,13,12,11,8,9,10},
       {23,22,21,20,19,16,17,18},
+
     };
 
 

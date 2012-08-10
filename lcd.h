@@ -1,8 +1,5 @@
 
- unsigned long LCDLastUpdated=0;
-// LCD - using a sainSmart i2c LCD connected to 20/21 of my MEGA
-  LiquidCrystal_I2C lcd(0x27,20,4);  // set the LCD address to 0x27 for a 16 chars and 2 line display
-  
+
   char* lcdData[4][4];
   char* lcdData_old[4][4];
   
