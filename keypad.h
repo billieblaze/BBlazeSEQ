@@ -26,9 +26,9 @@ void setupKeypad(){
 
 byte read_shift_regs(int row){
   byte bitVal;
-  byte bytesVal;
+  byte bytesVal = 0;
 
-  digitalWriteFast(ploadPin, LOW);
+ 
   digitalWriteFast(ploadPin, HIGH);
   
 
@@ -45,7 +45,7 @@ byte read_shift_regs(int row){
         digitalWriteFast(clockPin, LOW);
     }
 
-       
+    digitalWriteFast(ploadPin, LOW);
     return(bytesVal);
     
 }
@@ -74,14 +74,16 @@ void handleKeypad(){
       oldKeyPadValues[row] = newKeyPadValues[row];
        
       for (int i = 0; i < 8; i++) {
-        if (~newKeyPadValues[row] & B00000001 << i ){ 
+        if (~newKeyPadValues[row] & (B00000001 << i) ){ 
  
           curPosition = buttonMapping[row][i];
+          
           switch(editMode){ 
           
               case 0: // play
                
                   currentStep = curPosition; 
+          
                   if ( patternData[currentChannel][0][curPosition] == 1){ 
                     patternData[currentChannel][0][curPosition] = 0;
                   } else { 

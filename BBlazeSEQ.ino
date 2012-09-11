@@ -56,5 +56,5 @@ void loop(){
   handleMatrix();
   handleUI();  
   updateLCDArray();
-  writeToLCD();   
+   writeToLCD();   
 }
