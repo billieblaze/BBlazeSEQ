@@ -101,6 +101,7 @@ String version = "0.9";
     unsigned long UILastUpdated=0;
     unsigned long startTime = 0;
 
+    int gate[] = { 45,43,41, 39 }; 
     
     // Default Song Data
 boolean patternData[][5][32]  =  

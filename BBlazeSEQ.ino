@@ -41,7 +41,7 @@ void setup(){
   setupLEDMatrix(); 
   setupKeypad();
   setupMIDI();
-}
+ }
 
 // Main Loop
 void loop(){
@@ -56,5 +56,5 @@ void loop(){
   handleMatrix();
   handleUI();  
   updateLCDArray();
-   writeToLCD();   
+  writeToLCD();   
 }

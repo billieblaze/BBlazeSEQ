@@ -23,10 +23,12 @@ void playNotes(){
 
     if (noteOn == 0 ){ 
       MIDI.sendNoteOff( lastNote[channel],0,channel+1);
+      digitalWriteFast(gate[channel ], LOW );
     }
 
     if ( noteOn == 1 ) { 
       MIDI.sendNoteOn( note, velocity,channel+1);
+       digitalWriteFast(gate[channel], HIGH);
       lastNote[channel] = note;
     }
     
@@ -51,6 +53,10 @@ void HandleStart(){
 
 void HandleStop(){  
   runSequencer = 0; 
+  for ( int i = 0; i < channels; i++){
+  MIDI.sendNoteOff(lastNote[i],0, i+1);
+  digitalWriteFast(gate[i], LOW);
+  }
 }
 
 void HandleClock(){
@@ -88,5 +94,9 @@ void setupMIDI(){
   MIDI.setHandleStop(HandleStop);
   MIDI.setHandleContinue(HandleStart);
  // MIDI.turnThruOff();  
+ 
+ for ( int i = 0; i < channels; i++){ 
+    pinMode(gate[i], OUTPUT); 
+ }
 }
 
