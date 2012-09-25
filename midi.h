@@ -22,13 +22,14 @@ void playNotes(){
     int velocity = patternData[channel][2][tickCounter];
 
     if (noteOn == 0 ){ 
+     digitalWriteFast(gate[channel ],  LOW );
       MIDI.sendNoteOff( lastNote[channel],0,channel+1);
-      digitalWriteFast(gate[channel ], LOW );
+      
     }
 
     if ( noteOn == 1 ) { 
+      digitalWriteFast(gate[channel], HIGH);
       MIDI.sendNoteOn( note, velocity,channel+1);
-       digitalWriteFast(gate[channel], HIGH);
       lastNote[channel] = note;
     }
     
@@ -45,15 +46,15 @@ void HandleStart(){
   runSequencer = 1;
 
   // send patch numbers
-  for(int channel=0; channel <= channels; channel++){
-    MIDI.sendProgramChange(patternData[channel][3][0], channel+1);
-  }
+  //for(int channel=0; channel <= channels; channel++){
+  //  MIDI.sendProgramChange(patternData[channel][3][0], channel+1);
+ // }
   updateMatrix=1;
 }
 
 void HandleStop(){  
   runSequencer = 0; 
-  for ( int i = 0; i < channels; i++){
+ for ( int i = 0; i < channels; i++){
   MIDI.sendNoteOff(lastNote[i],0, i+1);
   digitalWriteFast(gate[i], LOW);
   }
@@ -92,8 +93,8 @@ void setupMIDI(){
   MIDI.setHandleStart(HandleStart);
   MIDI.setHandleClock(HandleClock);
   MIDI.setHandleStop(HandleStop);
-  MIDI.setHandleContinue(HandleStart);
- // MIDI.turnThruOff();  
+ MIDI.setHandleContinue(HandleStart);
+  MIDI.turnThruOn();  
  
  for ( int i = 0; i < channels; i++){ 
     pinMode(gate[i], OUTPUT); 

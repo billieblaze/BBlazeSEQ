@@ -106,15 +106,19 @@ void writeToLCD(){
         
         lcd.print(rowText1);
         lcd.setCursor(0,1);
+        MIDI.read();
         
         lcd.print(rowText2);
         lcd.setCursor(0,2);
+        MIDI.read();
 
         lcd.print(rowText3);
         lcd.setCursor(0,3);
+        MIDI.read();
 
         lcd.print(rowText4);
         
+        MIDI.read();
         
      for ( int i = 0; i < 4; i++){ 
       
@@ -123,7 +127,7 @@ void writeToLCD(){
        lcdData_old[i][2] = lcdData[i][2];
        lcdData_old[i][3] = lcdData[i][3];
     }
-   
+   MIDI.read();
     LCDLastUpdated = millis();   
   }
  updateLCD = 0;

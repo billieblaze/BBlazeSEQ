@@ -1,56 +1,64 @@
-#include <Wire.h> 
-#include <LiquidCrystal_I2C.h>
-#include <DFR_Key.h>
+
+#include <Wire.h>
+
 #include <MIDI.h>
+
+#include <LiquidCrystal_I2C.h>
+
+
 LiquidCrystal_I2C lcd(0x27,20,4);  // set the LCD address to 0x27 for a 16 chars and 2 line display
 
-DFR_Key keypad;
 
 /*
   MIDI Input tutorial
-  by Franky
-  28/07/2009
-  
-  NOTE: for easier MIDI input reading, 
-  take a look a the Callbacks example.
-  
-*/
+ by Franky
+ 28/07/2009
+ 
+ NOTE: for easier MIDI input reading, 
+ take a look a the Callbacks example.
+ 
+ */
 
+void HandleStart(){ 
+  //Serial.print("Start");
+} 
 
+void HandleClock(){ 
+ // Serial.print("Clock");
+} 
 
+void HandleStop(){ 
+  //Serial.print("Stop");
+} 
 
 void setup() {
-      lcd.init();                      // initialize the lcd 
+ // Serial.begin(9600);
+  lcd.init();                      // initialize the lcd 
+  
   lcd.backlight();
-lcd.print("WELCOME");
-  MIDI.begin();            	// Launch MIDI with default options
-				// (input channel is default set to 1)
+  
+  delay(500);
+  lcd.print("WELCOME");
+  
+  
+   MIDI.begin();            	// Launch MIDI with default options
+    MIDI.setHandleStart(HandleStart);
+ MIDI.setHandleClock(HandleClock);
+ MIDI.setHandleStop(HandleStop);
+MIDI.setHandleContinue(HandleStart);
+
+    MIDI.turnThruOn();
+  
+  //Serial.print("Start");
+ 
+  // (input channel is default set to 1)
 }
 
 void loop() {
+ // Serial.print("read: ");
+  //Serial.print(millis());
+  MIDI.read(); 
+  /Serial.print(" - Complete \n");
 
-  if (MIDI.read()) {                    // Is there a MIDI message incoming ?
-    lcd.setCursor(0,1);
-    
-    switch(MIDI.getType()) {		// Get the type of the message we caught
-      case ProgramChange:               // If it is a Program Change
-	lcd.print(MIDI.getData1());	// Blink the LED a number of times 
-					// correponding to the program number 
-					// (0 to 127, it can last a while..)
-        break;
-      case ControlChange:
-    lcd.print("CC: ");
-    lcd.print(MIDI.getData1());	
-    lcd.print(" -  ");    
-    lcd.print(MIDI.getData2());
-    lcd.print("     ");
-
-      // See the online reference for other message types
-      
-      default:
-      
-    
-        break;
-    }
-  }
 }
+

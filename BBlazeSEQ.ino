@@ -12,7 +12,7 @@
 #include <Wire.h>
 
 #include "SPI.h"
-#include "hsv2rgb.h"
+
 #include <MIDI.h>
 #include <LiquidCrystal_I2C.h>
 #include <digitalWriteFast.h>
@@ -46,15 +46,18 @@ void setup(){
 // Main Loop
 void loop(){
  startTime = millis();
-
-  MIDI.read();
- 
-  if(startTime % 2 == 0){ 
-     scanUI();  
-  }
- 
-  handleMatrix();
-  handleUI();  
-  updateLCDArray();
-  writeToLCD();   
+ MIDI.read();
+ scanUI();
+ MIDI.read();
+ handleMatrix();
+ MIDI.read();
+ handleEncoders(); 
+ MIDI.read();
+ handleNavButtons();
+ MIDI.read(); 
+ handleKeypad();
+ MIDI.read();
+ updateLCDArray();
+ writeToLCD();
+ MIDI.read();  
 }

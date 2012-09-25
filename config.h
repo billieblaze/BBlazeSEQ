@@ -14,8 +14,8 @@ String version = "0.9";
     const bool ShiftMatrixPWM_invertColumnOutputs = 0; // if invertColumnOutputs is 1, outputs will be active low. Usefull for common anode RGB led's.
     const bool ShiftMatrixPWM_invertRowOutputs = 1; // if invertOutputs is 1, outputs will be active low. Used for PNP transistors.
     
-    unsigned char maxBrightness = 1;
-    unsigned char pwmFrequency = 30;
+    unsigned char maxBrightness = 10;
+    unsigned char pwmFrequency = 60;
     
     int numColumnRegisters = 3; 
     int numRows=4;

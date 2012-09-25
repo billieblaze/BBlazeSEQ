@@ -22,8 +22,4 @@ void scanUI( ){
   scanKeypad();
 }
 
-void handleUI( ) { 
-    handleEncoders();
-    handleNavButtons();
-    handleKeypad(); 
-}
+

@@ -1,6 +1,8 @@
 
 void encoderChange( int encoder,int value){
-
+  updateLCD = 1;
+  updateMatrix = 1;
+        
   switch(encoder){
 
   case 0: // current channel
@@ -138,8 +140,7 @@ void handleEncoders(){
 
         }  
         oldNavKeyValues[row] = newNavKeyValues[row];
-        updateLCD = 1;
-        updateMatrix = 1;
+        
       }
 
     }
