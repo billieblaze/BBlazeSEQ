@@ -64,7 +64,8 @@ if (  updateMatrix == 1){
      
       i++;  
     }
-  }
+  
+  }  MIDI.read();
    updateMatrix = 0;
 }
 }

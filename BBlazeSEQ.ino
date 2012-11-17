@@ -48,16 +48,10 @@ void loop(){
  startTime = millis();
  MIDI.read();
  scanUI();
- MIDI.read();
  handleMatrix();
- MIDI.read();
  handleEncoders(); 
- MIDI.read();
- handleNavButtons();
- MIDI.read(); 
+ handleNavButtons(); 
  handleKeypad();
- MIDI.read();
  updateLCDArray();
- writeToLCD();
- MIDI.read();  
+ writeToLCD(); 
 }

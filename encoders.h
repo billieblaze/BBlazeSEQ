@@ -142,7 +142,7 @@ void handleEncoders(){
         oldNavKeyValues[row] = newNavKeyValues[row];
         
       }
-
+      MIDI.read();
     }
   }
 }

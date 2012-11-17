@@ -55,15 +55,16 @@ void scanKeypad(){
   // scan the key matrix
   shiftOut(keypadOutputDataPin, keypadOutputClockPin, LSBFIRST,  254);
   newKeyPadValues[0] = read_shift_regs(1);
-  
+        MIDI.read();
   shiftOut(keypadOutputDataPin, keypadOutputClockPin, LSBFIRST,  247);
   newKeyPadValues[1] = read_shift_regs(2);
-  
+        MIDI.read();
   shiftOut(keypadOutputDataPin, keypadOutputClockPin, LSBFIRST,  251);
   newKeyPadValues[2] = read_shift_regs(3);
-  
+        MIDI.read();
   shiftOut(keypadOutputDataPin, keypadOutputClockPin, LSBFIRST,  253);
   newKeyPadValues[3] = read_shift_regs(4);
+        MIDI.read();
 }
 
 void handleKeypad(){
@@ -102,13 +103,19 @@ void handleKeypad(){
           
                // pressed button
                     if (recordLastNote == curPosition){ // hold it
+                         
+                         digitalWriteFast(gate[currentChannel], LOW);
+                         
                          patternData[currentChannel][0][tickCounter] = 2;
                          patternData[currentChannel][1][tickCounter] = curPosition+oct3;
+
                     }
                       
                     if (recordLastNote != curPosition && recordLastPosition != i){
                         //MIDI.sendNoteOff(recordLastNote+oct3,0,currentChannel +1);  
                         MIDI.sendNoteOn(curPosition+oct3,127,currentChannel +1);
+                        
+                       digitalWriteFast(gate[currentChannel], HIGH);
                        
                         patternData[currentChannel][0][tickCounter] = 1;
                         patternData[currentChannel][1][tickCounter] = curPosition+oct3;
@@ -134,6 +141,8 @@ void handleKeypad(){
                 //NEED TO MOVE THIS - RELEASE NOTE IS NOT FIRING! 
                   if ( recordLastNote == curPosition && recordLastPosition == i) {     
                      MIDI.sendNoteOff(recordLastNote+oct3,0,currentChannel +1);  
+                     digitalWriteFast(gate[currentChannel], LOW);
+ 
                      patternData[currentChannel][0][tickCounter] = 0;
                      patternData[currentChannel][1][tickCounter] = curPosition+oct3;
                      recordLastNote=0;
@@ -143,7 +152,9 @@ void handleKeypad(){
               }
           }
       } 
+      MIDI.read();
       updateMatrix = 1;
+            
     }
   }  
   

@@ -80,12 +80,15 @@ char buffer5[255];
         lcdData[3][0] = " hld ";
         break;
     }
+    
+     MIDI.read();
+     
      sprintf(buffer4, " %d ", patternData[currentChannel][1][currentStep]);
    lcdData[3][1] = buffer4 ; 
     sprintf(buffer5, " %d ",patternData[currentChannel][2][currentStep]);
    lcdData[3][2] = buffer5;
    lcdData[3][3] = "";
-   
+    MIDI.read();
      sprintf(rowText1, "%s%s%s%s",lcdData[0][0], lcdData[0][1], lcdData[0][2],lcdData[0][3]);
      sprintf(rowText2, "%s%s%s%s",lcdData[1][0], lcdData[1][1], lcdData[1][2],lcdData[1][3]);
      sprintf(rowText3, "%s%s%s%s",lcdData[2][0], lcdData[2][1], lcdData[2][2],lcdData[2][3]);

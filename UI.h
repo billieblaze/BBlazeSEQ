@@ -18,6 +18,9 @@ void scanUI( ){
       } 
   
       newNavKeyValues[row]=bytesVal;
+      
+       MIDI.read();
+       
     }
   scanKeypad();
 }

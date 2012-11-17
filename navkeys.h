@@ -56,6 +56,9 @@ void handleNavButtons(){
           }
           i++;
       }
+      
+       MIDI.read();
+       
     }
   
 }

@@ -1,35 +1,37 @@
- int MIDIClockCounter = 0;
-    int tickCounter = 0;
-    int runSequencer=0;
-    int editMode=0;
-    int editParam=0;
+int MIDIClockCounter = 0;
+int tickCounter = 0;
+int runSequencer=0;
+int editMode=0;
+int editParam=0;
 
+int currentChannel = 0;  // which channel are we viewing?
+int currentStep = 0;
 
-  int currentChannel = 0;  // which channel are we viewing?
-    int currentStep = 0;
-
-
-    int lastNote[4] = {0,0,0,0};
-    int recordLastNote = 0;
-    int recordLastPosition = 0;
-    int curPosition = 0;
-    int keyOctave = 3;
+int lastNote[4] = {0,0,0,0};
+int recordLastNote = 0;
+int recordLastPosition = 0;
+int curPosition = 0;
+int keyOctave = 3;
+    
     
 void playNotes(){
   for(int channel=0; channel <= channels; channel++){
     int noteOn = patternData[channel][0][tickCounter];
-    int note = patternData[channel][1][tickCounter];
-    int velocity = patternData[channel][2][tickCounter];
+    
 
     if (noteOn == 0 ){ 
-     digitalWriteFast(gate[channel ],  LOW );
+     
       MIDI.sendNoteOff( lastNote[channel],0,channel+1);
-      
+      digitalWriteFast(gate[channel ],  LOW );
     }
 
     if ( noteOn == 1 ) { 
-      digitalWriteFast(gate[channel], HIGH);
+      int note = patternData[channel][1][tickCounter];
+      int velocity = patternData[channel][2][tickCounter];
       MIDI.sendNoteOn( note, velocity,channel+1);
+      digitalWriteFast(gate[channel], HIGH);
+      
+  
       lastNote[channel] = note;
     }
     
@@ -44,7 +46,8 @@ void HandleStart(){
   MIDIClockCounter = 0;
   tickCounter=0;
   runSequencer = 1;
-
+ ShiftMatrixPWM.SetAll(0);
+ delay(1000);
   // send patch numbers
   //for(int channel=0; channel <= channels; channel++){
   //  MIDI.sendProgramChange(patternData[channel][3][0], channel+1);
@@ -66,7 +69,7 @@ void HandleClock(){
 
     // play notes every time the clock divider rolls over
     if (MIDIClockCounter == 0){
-       playNotes();
+      playNotes();
       updateMatrix=1;
       tickCounter++;
     } 
@@ -93,7 +96,7 @@ void setupMIDI(){
   MIDI.setHandleStart(HandleStart);
   MIDI.setHandleClock(HandleClock);
   MIDI.setHandleStop(HandleStop);
- MIDI.setHandleContinue(HandleStart);
+  MIDI.setHandleContinue(HandleStart);
   MIDI.turnThruOn();  
  
  for ( int i = 0; i < channels; i++){ 
