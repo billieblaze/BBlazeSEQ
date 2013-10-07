@@ -1,7 +1,6 @@
 String version = "0.9";
- unsigned long LCDLastUpdated=0;
 // LCD - using a sainSmart i2c LCD connected to 20/21 of my MEGA
-  LiquidCrystal_I2C lcd(0x27,20,4);  // set the LCD address to 0x27 for a 16 chars and 2 line display
+    LiquidCrystal_I2C lcd(0x27,20,4);  // set the LCD address to 0x27 for a 16 chars and 2 line display
   
 // ShiftMatrixPWM handles the led matrix and connects to a group of 3 daisy chained 74hc595's to control RGB (columns) and a seperate 74hc595 (rows)
   //Data pin is MOSI (atmega168/328: pin 11. Mega: 51) 
@@ -90,11 +89,8 @@ String version = "0.9";
 
 // Clock and Counter - all the bits the sequencer uses to track position / time / etc
     int channels = 15;
-          int updateMatrix = 1;
-        int updateLCD = 1;
-        
-          byte oldNavKeyValues[]={255,255,255,255};
-    byte newNavKeyValues[]={255,255,255,255};
+          
+
 
 
    

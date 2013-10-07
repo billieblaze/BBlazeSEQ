@@ -1,9 +1,8 @@
-    byte oldKeyPadValues[]={0,0,0,0};
-    byte newKeyPadValues[]={0,0,0,0};
-
-
-
-void setupKeypad(){
+    byte oldKeyPadValues[]={255,255,255,255};
+    byte newKeyPadValues[]={255,255,255,255};
+    
+    
+void setupKeyMatrix(){
   // matrix keypad
   pinMode(keypadOutputClockPin, OUTPUT); // make the clock pin an output
   pinMode(keypadOutputDataPin , OUTPUT); // make the data pin an output
@@ -15,13 +14,7 @@ void setupKeypad(){
   digitalWrite(clockPin, LOW);
   digitalWrite(ploadPin, HIGH);  
 
-  // nav keys
-  pinMode(navploadPin, OUTPUT);
-  pinMode(navclockPin, OUTPUT);
-  pinMode(navdataPin, INPUT);
-
-  digitalWrite(navclockPin, LOW);
-  digitalWrite(navploadPin, HIGH);  
+ 
 }
 
 byte read_shift_regs(int row){
@@ -50,24 +43,26 @@ byte read_shift_regs(int row){
     
 }
 
-void scanKeypad(){
+
+
+void scanKeyMatrix(){
 
   // scan the key matrix
   shiftOut(keypadOutputDataPin, keypadOutputClockPin, LSBFIRST,  254);
   newKeyPadValues[0] = read_shift_regs(1);
-        MIDI.read();
   shiftOut(keypadOutputDataPin, keypadOutputClockPin, LSBFIRST,  247);
   newKeyPadValues[1] = read_shift_regs(2);
-        MIDI.read();
   shiftOut(keypadOutputDataPin, keypadOutputClockPin, LSBFIRST,  251);
   newKeyPadValues[2] = read_shift_regs(3);
-        MIDI.read();
   shiftOut(keypadOutputDataPin, keypadOutputClockPin, LSBFIRST,  253);
   newKeyPadValues[3] = read_shift_regs(4);
-        MIDI.read();
+  
+  if (newKeyPadValues[0] != oldKeyPadValues[0] || newKeyPadValues[1] != oldKeyPadValues[1] || newKeyPadValues[2] != oldKeyPadValues[2] ||newKeyPadValues[3] != oldKeyPadValues[3] ){
+    chBSemSignal(&semDIN);
+  }   
 }
 
-void handleKeypad(){
+void handleKeyMatrix(){
  
   for (int row = 0; row < 4;  row++){
     if (newKeyPadValues[row] != oldKeyPadValues[row]){
@@ -95,7 +90,6 @@ void handleKeypad(){
                 
               case 1: // edit
                   currentStep = curPosition; 
-                  updateLCD=1; 
                 break;
                 
                 
@@ -152,9 +146,6 @@ void handleKeypad(){
               }
           }
       } 
-      MIDI.read();
-      updateMatrix = 1;
-            
     }
   }  
   

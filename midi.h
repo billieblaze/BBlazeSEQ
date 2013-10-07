@@ -46,13 +46,14 @@ void HandleStart(){
   MIDIClockCounter = 0;
   tickCounter=0;
   runSequencer = 1;
- ShiftMatrixPWM.SetAll(0);
+// ShiftMatrixPWM.SetAll(0);
  delay(1000);
   // send patch numbers
   //for(int channel=0; channel <= channels; channel++){
   //  MIDI.sendProgramChange(patternData[channel][3][0], channel+1);
  // }
-  updateMatrix=1;
+//      chSemSignal(&semMatrix);
+  
 }
 
 void HandleStop(){  
@@ -70,7 +71,7 @@ void HandleClock(){
     // play notes every time the clock divider rolls over
     if (MIDIClockCounter == 0){
       playNotes();
-      updateMatrix=1;
+//      chSemSignal(&semMatrix);
       tickCounter++;
     } 
 

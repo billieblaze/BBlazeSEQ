@@ -27,7 +27,6 @@ void setupLEDMatrix(){
 
 void handleMatrix(){
   int i= 0;
-if (  updateMatrix == 1){
   // loop thru the grid
   for(int row=0;row<numRows;row++){
     for(int col=0;col<(numColumns/3);col++){
@@ -65,7 +64,6 @@ if (  updateMatrix == 1){
       i++;  
     }
   
-  }  MIDI.read();
-   updateMatrix = 0;
-}
+  } 
+ 
 }

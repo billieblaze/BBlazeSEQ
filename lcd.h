@@ -13,6 +13,8 @@
 void setupLCD(){
   lcd.init();                   
   lcd.backlight();
+  delay(100);
+  lcd.setCursor(0,0);
   lcd.print("bblazeSEQ v" + version);
   lcd.setCursor(0,1);
   lcd.print("Init...");
@@ -26,8 +28,6 @@ char buffer2[255];
 char buffer3[255];
 char buffer4[255];
 char buffer5[255];
-
-   if(updateLCD == 1){
 
     // row 1
     lcdData[0][0] = "Chan ";
@@ -81,26 +81,20 @@ char buffer5[255];
         break;
     }
     
-     MIDI.read();
-     
+   
      sprintf(buffer4, " %d ", patternData[currentChannel][1][currentStep]);
    lcdData[3][1] = buffer4 ; 
     sprintf(buffer5, " %d ",patternData[currentChannel][2][currentStep]);
    lcdData[3][2] = buffer5;
    lcdData[3][3] = "";
-    MIDI.read();
-     sprintf(rowText1, "%s%s%s%s",lcdData[0][0], lcdData[0][1], lcdData[0][2],lcdData[0][3]);
+    
+    sprintf(rowText1, "%s%s%s%s",lcdData[0][0], lcdData[0][1], lcdData[0][2],lcdData[0][3]);
      sprintf(rowText2, "%s%s%s%s",lcdData[1][0], lcdData[1][1], lcdData[1][2],lcdData[1][3]);
      sprintf(rowText3, "%s%s%s%s",lcdData[2][0], lcdData[2][1], lcdData[2][2],lcdData[2][3]);
      sprintf(rowText4, "%s%s%s%s",lcdData[3][0], lcdData[3][1], lcdData[3][2],lcdData[3][3]);
-  updateLCD = 2;
  }
-}
 
 void writeToLCD(){
-
-
-   if(startTime - LCDLastUpdated > 1000 && lcdData != lcdData_old && updateLCD == 2){  
 
 
         
@@ -109,19 +103,14 @@ void writeToLCD(){
         
         lcd.print(rowText1);
         lcd.setCursor(0,1);
-        MIDI.read();
-        
         lcd.print(rowText2);
         lcd.setCursor(0,2);
-        MIDI.read();
-
+        
         lcd.print(rowText3);
         lcd.setCursor(0,3);
-        MIDI.read();
-
+        
         lcd.print(rowText4);
         
-        MIDI.read();
         
      for ( int i = 0; i < 4; i++){ 
       
@@ -130,9 +119,5 @@ void writeToLCD(){
        lcdData_old[i][2] = lcdData[i][2];
        lcdData_old[i][3] = lcdData[i][3];
     }
-   MIDI.read();
-    LCDLastUpdated = millis();   
-  }
- updateLCD = 0;
-
+  
 };
