@@ -47,7 +47,7 @@ void setup()   {
   SPI.begin(); 
 
   Serial.begin(9600);
-
+Serial.print("START");
 
   ShiftMatrixPWM.SetMatrixSize(numRows, numColumnRegisters);
   ShiftMatrixPWM.Start(pwmFrequency,maxBrightness);  

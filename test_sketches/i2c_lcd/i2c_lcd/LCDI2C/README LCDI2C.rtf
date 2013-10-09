@@ -1,0 +1,142 @@
+{\rtf1\ansi\ansicpg1252\cocoartf949\cocoasubrtf430
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+\margl1440\margr1440\vieww17000\viewh12540\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\f0\fs24 \cf0 This is a library I put together to use the web4robot.com lcd display in I2C mode.\
+\
+I have no financial interest in web4robot.com, I purchased one of their displays on e-bay to experiment with.\
+\
+I used the code I found e for the arduino-4bitlcd libary from http://code.google.com/p/arduino-4bitlcd/  as a place to start\
+\
+It uses the standard Arduino I2c Wires interface and the following pins\
+\
+Uses Analog pin 4 - SDA\
+Uses Analog pin 5 - SCL\
+\
+The LCD and keypad are supported. The interrupt pin for the keypad is not supported by this version of the library.\
+\
+Graphing functions contributed to the library by Ran Talbott\
+\
+\
+---------\
+\
+\
+Init with \
+\
+LCDI2C lcd = LCDI2C(2,16,0x4C,0);             // Where number of lines = 2, Columns = 16 and 0x4C is the i2c address of the display, type of display(Future Use)\
+\
+\
+The following commands are available for within the library.\
+\
+\
+init()					Init the LCD and library functions, Clears the display, turns off the cursors\
+\
+command(command)		Write a command not supported yet in the library to the display\
+\
+position(Row, Column)		Move the cursor to position valid range is Row[0-3], Column[0,19]\
+\
+setCursor(Row,Column)		Same as position\
+\
+print(val)				Uses the inherited print command so you can do things like lcd.print(int,DEC);\
+\
+println(val)				Uses the inherited print command so you can do things like lcd.print(int,DEC);\
+\
+printstr(string)			Print a string to the display\
+\
+write(byte)				Raw write a single byte to the display\
+\
+clear()					Clear the display and place the cursor at 0,0\
+  \
+home()				Home the cursor to 0,0 but do not clear the display\
+  \
+on()					Turn the LCD display on\
+  \
+off()					Turn the LCD display off (not backlight does not go off)\
+  \
+cursor_on()				Turn the blinking line cursor on\
+  \
+cursor_off()				Turn the blinking line cursor off\
+  \
+blink_on()				Turn the blinking block cursor on\
+  \
+blink_off()				Turn the blinking block cursor on\
+  \
+left()					Move the cursor to the left\
+  \
+right()					Move the cursor to the right\
+  \
+keypad()				read a value from the keypad. Returns 0 if no key press is in the buffer\
+\
+init_bargraph(mode)		Init graphics functions where mode can be\
+						LCDI2C_VERTICAL_BAR_GRAPH\
+						LCDI2C_HORIZONTAL_BAR_GRAPH\
+						LCDI2C_HORIZONTAL_LINE_GRAPH\
+\
+draw_horizontal_graph(row,col,len,end)\
+\
+draw_vertical_graph(row,col,len,end)\
+\
+load_custom_character(char_num,*char)\
+\
+set_backlight_brightness(val)\
+\
+set_contrast(val)\
+\
+  -------------------------------------------------------------------\
+\
+\
+Version 0.1				3/4/2009 Initial Release\
+\
+Version 0.2				3/12/2009\
+\
+					Change the print and println so they use the inherited print library.\
+					This allows us to do things like lcd.print(int,DEC);\
+\
+					Changed the commandWrite(command) to command(command) to bring it more in line with the crystaldisplay library\
+\
+					Changed the position command to setCursor to bring it more in line with the crystaldisplay library\
+\
+					Cleaned up the code a bit\
+\
+Version 0.3				3/16/2009\
+				\
+					Optimized code\
+\
+					Created new Samples\
+\
+Version 0.4				3/27/09\
+\
+					Added strprint, custom characters, graphing functions, brightness and contrast classes contributed by Ran Talbott\
+					Also added some sample sketchs to show off the functions.\
+					Fixed name so samples load up correctly\
+\
+Things to do:\
+\
+					Add support to new features being added to the web4robot display.\
+\
+					Add support for the following displays		\
+						http://www.robot-electronics.co.uk/htm/Lcd03tech.htm\
+						www.newhavendisplay.com\
+\
+Future\
+\
+					Possibly Add support for the i2c displays from \
+						www.spikenzielabs.com\
+						www.hvwtech.com\
+						www.robotshop.com\
+						www.channaa.com\
+\
+					(If you are the manufacture of an i2c based LCD character display and would like you display included in the library\
+					Please contact me. I will require a sample display and or driver board to keep on hand for testingfrom you.)\
+\
+\
+\
+Please send comments and suggestions to dale@wentztech.com\
+For the most up-to-date information on this library please goto http://www.wentztech.com/radio\
+\
+\
+\
+\
+	}

@@ -1,3 +1,7 @@
+// Chibios Semaphores
+BSEMAPHORE_DECL(semDIN, 1);
+BSEMAPHORE_DECL(semLCD, 1);  
+
 // MIDI notes
 #define  C   0
 #define  Cs  1

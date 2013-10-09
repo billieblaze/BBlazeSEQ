@@ -1,4 +1,15 @@
+unsigned char maxBrightness = 10;
+unsigned char pwmFrequency = 60;
 
+int numColumnRegisters = 3; 
+int numRows=4;
+
+int numColumns = numColumnRegisters*8;
+int numOutputs = numColumns*numRows;
+
+int lastRow = 0;
+int lastCol = 0;
+   
 void setGroupOf3(int row, int start, int r, int g, int b){
   ShiftMatrixPWM.SetOne(row, start, r);
   ShiftMatrixPWM.SetOne(row, start+1, g);
@@ -21,11 +32,18 @@ void setupLEDMatrix(){
 
   ShiftMatrixPWM.SetMatrixSize(numRows, numColumnRegisters);
   ShiftMatrixPWM.Start(pwmFrequency,maxBrightness);  
- ShiftMatrixPWM.SetAll(0);
+  ShiftMatrixPWM.PrintInterruptLoad();
+  ShiftMatrixPWM.SetAll(255);
+  
+  for(int i = 255; i > 0; i--){
+    ShiftMatrixPWM.SetAll(i);
+    delay(50);
+  }
 
 }
 
-void handleMatrix(){
+void handleLEDMatrix(){
+  
   int i= 0;
   // loop thru the grid
   for(int row=0;row<numRows;row++){
@@ -67,3 +85,23 @@ void handleMatrix(){
   } 
  
 }
+
+
+static WORKING_AREA(waProcessMatrix, 64);
+
+static msg_t ProcessMatrix(void *arg) {
+  
+   
+  while (1) {
+     scanKeyMatrix();
+    // Wait for signal from thread 2.
+   chBSemWait(&semDIN);
+ 
+    Serial.println("ProcessMatrix");
+     handleLEDMatrix(); 
+   
+  }
+  return 0;  
+}
+
+

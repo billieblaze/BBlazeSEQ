@@ -105,3 +105,27 @@ void setupMIDI(){
  }
 }
 
+// 64 byte stack beyond task switch and interrupt needs
+static WORKING_AREA(waMIDI, 64);
+
+static msg_t doMIDI(void *arg) {
+  Serial.println("Setup MIDI");
+//  setupMIDI();
+
+  while (1) {
+ 
+//    chSemWait(&semMIDI);
+ 
+    // do something
+     // Serial.println("Process MIDI");
+
+    //MIDI.read();
+
+    // Signal thread 1 to turn LED off.
+    //chSemSignal(&sem);
+
+  }
+  return 0;  
+}
+
+

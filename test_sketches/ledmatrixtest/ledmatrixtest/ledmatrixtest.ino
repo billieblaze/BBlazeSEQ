@@ -17,10 +17,10 @@ String version = "0.3";
 
 //Data pin is MOSI (atmega168/328: pin 11. Mega: 51) 
 //Clock pin is SCK (atmega168/328: pin 13. Mega: 52)
-const int ShiftMatrixPWM_columnLatchPin=3;
-const int ShiftMatrixPWM_rowDataPin=A2;
-const int ShiftMatrixPWM_rowClockPin=A3;
-const int ShiftMatrixPWM_rowLatchPin=A4;
+const int ShiftMatrixPWM_columnLatchPin=49;
+const int ShiftMatrixPWM_rowDataPin=A15;
+const int ShiftMatrixPWM_rowClockPin=A14;
+const int ShiftMatrixPWM_rowLatchPin=A13;
 
 const bool ShiftMatrixPWM_invertColumnOutputs = 0; // if invertColumnOutputs is 1, outputs will be active low. Usefull for common anode RGB led's.
 const bool ShiftMatrixPWM_invertRowOutputs = 1; // if invertOutputs is 1, outputs will be active low. Used for PNP transistors.
@@ -43,9 +43,7 @@ int g = 150;
 int b = 150;
 
 
-// LCD Keys
-LiquidCrystal lcd(8, 9, 4, 5, 6, 7); 
-DFR_Key keypad;
+
 int localKey = 0; 
 String keyString = "";
 
@@ -61,14 +59,10 @@ void setGroupOf3(int row, int start, int r, int g, int b){
 // SETUP                 
 void setup() { 
 
-  lcd.begin(16, 2);
-  lcd.clear();
-  lcd.print("LED Matrix Test");
-  lcd.print(version);
-  
+
 
   // setup keys
-  keypad.setRate(100);
+
    
   
   //Setup LED Matrix
@@ -86,10 +80,8 @@ void setup() {
   ShiftMatrixPWM.SetMatrixSize(numRows, numColumnRegisters);
   ShiftMatrixPWM.Start(pwmFrequency,maxBrightness);  
   ShiftMatrixPWM.SetAll(0);
- lcd.clear();
-     lcd.print(col);
-     lcd.print ( " -- ");
-     lcd.print(row);
+
+
 }
 void  nextNode(){
        setGroupOf3(row,col,0,0,0);
@@ -103,38 +95,21 @@ void  nextNode(){
     };
     col = 0;
   }
-    lcd.clear();
-    lcd.print(row);
-    lcd.print("-");
-    lcd.print(col);
-    lcd.setCursor(0,1);
-       lcd.print("RED");
+   
          setGroupOf3(row,col*3, 255,0,0);
     delay(1500);
-    lcd.setCursor(0,1);
-       lcd.print("GREEN");
-           setGroupOf3(row,col, 0,255,0);
+             setGroupOf3(row,col, 0,255,0);
     delay(1500);
-    lcd.setCursor(0,1);
-         lcd.print("BLUE");
-             setGroupOf3(row,col, 0,0,255);
+              setGroupOf3(row,col, 0,0,255);
     delay(1500);
-    lcd.setCursor(0,1);
-       lcd.print("yellow");
          setGroupOf3(row,col*3, 255,255,0);
     delay(1500);
     
-    lcd.setCursor(0,1);
-       lcd.print("L Blue");
          setGroupOf3(row,col*3, 0,255,255);
     delay(1500);
     
-lcd.setCursor(0,1);
-       lcd.print("Purple ");
          setGroupOf3(row,col*3, 255,0,255);
     delay(1500);
-    lcd.setCursor(0,1);
-        lcd.print("White  ");
          setGroupOf3(row,col*3, 255,255,255);
     delay(1500);
 
@@ -143,15 +118,5 @@ lcd.setCursor(0,1);
 
 void loop() { 
   
- localKey = keypad.getKey();
-  
-
-
-  if (localKey != SAMPLE_WAIT){
-    
- 
-     switch (localKey) {
-	case 3:   nextNode();  break;
-     }  
-  }
+   nextNode();  
 }

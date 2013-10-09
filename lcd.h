@@ -1,19 +1,9 @@
 
-
-  char* lcdData[4][4];
-  char* lcdData_old[4][4];
-  
-     char rowText1[255]; 
-   char rowText2[255]; 
-   char rowText3[255]; 
-   char rowText4[255]; 
-
-// I had to increase the freq of i2c in twi.h (inside wire library) to 300hz.  i also commented out the delays in there to try and tighten up the response
+char* lcdData[4][4];
 
 void setupLCD(){
-  lcd.init();                   
+  lcd.init();       
   lcd.backlight();
-  delay(100);
   lcd.setCursor(0,0);
   lcd.print("bblazeSEQ v" + version);
   lcd.setCursor(0,1);
@@ -23,52 +13,30 @@ void setupLCD(){
 }
 
 void updateLCDArray(){
-char buffer1[255];
-char buffer2[255];
-char buffer3[255];
-char buffer4[255];
-char buffer5[255];
-
-    // row 1
-    lcdData[0][0] = "Chan ";
-    lcdData[0][1] = "Step ";
-    lcdData[0][2] = "Mode ";
-    lcdData[0][3] = "Ptch ";
+   // row 1
+  lcdData[0][0] = "Chan ";
+  lcdData[0][1] = "Step ";
+  lcdData[0][2] = "Mode ";
+  lcdData[0][3] = "Ptch ";
     
-   
-    // row 2
-   sprintf(buffer1, " %d   ", currentChannel+1);
-   lcdData[1][0] = buffer1;
-   
-   
-   sprintf(buffer2, " %d  ", currentStep);
-   lcdData[1][1] = buffer2;
+  // row2 
+  lcdData[1][0] += currentChannel+1;
+  lcdData[1][1] += currentStep;
  
-  
-    if (editMode == 0){
-     lcdData[1][2] = " Play ";
-    }
-  
-    if (editMode == 1){
-       lcdData[1][2] = " Edit ";
-    }
-  
-    if (editMode == 2){
-       lcdData[1][2] = " Rec  ";
-    }
-    
+  if (editMode == 0){  lcdData[1][2] = " Play ";  }
+  if (editMode == 1){  lcdData[1][2] = " Edit ";  }
+  if (editMode == 2){  lcdData[1][2] = " Rec  ";  }
 
-  sprintf(buffer3, " %d ", patternData[currentChannel][3][0]);
-   lcdData[1][3] = buffer3;
-   
-    // row 3
-    lcdData[2][0] = "Note ";
-    lcdData[2][1] = "NNum ";
-    lcdData[2][2] = "Velo ";
-    lcdData[2][3] = "     ";
+  lcdData[1][3] += patternData[currentChannel][3][0];
   
-    // row 4
-    int noteOnData = patternData[currentChannel][0][currentStep];
+  // row 3
+  lcdData[2][0] = "Note ";
+  lcdData[2][1] = "NNum ";
+  lcdData[2][2] = "Velo ";
+  lcdData[2][3] = "     ";
+  
+  // row 4
+  int noteOnData = patternData[currentChannel][0][currentStep];
     switch(noteOnData){
       case 0:
         lcdData[3][0] = " off ";
@@ -80,44 +48,60 @@ char buffer5[255];
         lcdData[3][0] = " hld ";
         break;
     }
-    
-   
-     sprintf(buffer4, " %d ", patternData[currentChannel][1][currentStep]);
-   lcdData[3][1] = buffer4 ; 
-    sprintf(buffer5, " %d ",patternData[currentChannel][2][currentStep]);
-   lcdData[3][2] = buffer5;
-   lcdData[3][3] = "";
-    
-    sprintf(rowText1, "%s%s%s%s",lcdData[0][0], lcdData[0][1], lcdData[0][2],lcdData[0][3]);
-     sprintf(rowText2, "%s%s%s%s",lcdData[1][0], lcdData[1][1], lcdData[1][2],lcdData[1][3]);
-     sprintf(rowText3, "%s%s%s%s",lcdData[2][0], lcdData[2][1], lcdData[2][2],lcdData[2][3]);
-     sprintf(rowText4, "%s%s%s%s",lcdData[3][0], lcdData[3][1], lcdData[3][2],lcdData[3][3]);
+
+  lcdData[3][1] += patternData[currentChannel][1][currentStep] ;    
+  lcdData[3][2] += patternData[currentChannel][2][currentStep];
+  lcdData[3][3] = "";     
  }
 
+
 void writeToLCD(){
-
-
-        
-     lcd.setCursor(0,0);
-        
-        
-        lcd.print(rowText1);
-        lcd.setCursor(0,1);
-        lcd.print(rowText2);
-        lcd.setCursor(0,2);
-        
-        lcd.print(rowText3);
-        lcd.setCursor(0,3);
-        
-        lcd.print(rowText4);
-        
-        
-     for ( int i = 0; i < 4; i++){ 
-      
-       lcdData_old[i][0] = lcdData[i][0];
-       lcdData_old[i][1] = lcdData[i][1];
-       lcdData_old[i][2] = lcdData[i][2];
-       lcdData_old[i][3] = lcdData[i][3];
-    }
   
+  lcd.setCursor(0,0);   
+
+  lcd.print(lcdData[0][0]);  
+  lcd.print(lcdData[0][1]);
+  lcd.print(lcdData[0][2]);
+  lcd.print(lcdData[0][3]);
+
+  lcd.setCursor(0,1);
+  
+  lcd.print(lcdData[1][0]);
+  lcd.print(lcdData[1][1]);
+  lcd.print(lcdData[1][2]);
+  lcd.print(lcdData[1][3]);
+  
+/*  lcd.setCursor(0,2);    
+  
+  lcd.print(lcdData[2][0]);
+  lcd.print(lcdData[2][1]);
+  lcd.print(lcdData[2][2]);
+  lcd.print(lcdData[2][3]);
+  
+  lcd.setCursor(0,3);   
+  
+  lcd.print(lcdData[3][0]);
+  lcd.print(lcdData[3][1]);
+  lcd.print(lcdData[3][2]);
+  lcd.print(lcdData[3][3]);*/
 };
+
+
+static WORKING_AREA(waLCD, 64);
+
+static msg_t doLCD(void *arg) {
+ Serial.println("Scan LCD");
+  chBSemSignal(&semLCD);
+  while (1) {
+   chBSemWait(&semLCD);
+     Serial.println("Process LCD");
+     
+     updateLCDArray();
+     writeToLCD();   
+
+    Serial.println("LCD Updated");
+  
+  }
+  return 0;  
+}
+
