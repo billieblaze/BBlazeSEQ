@@ -4,8 +4,8 @@ LED Matrix Tester
 
 #include "SPI.h"
 #include <avr/pgmspace.h>
-#include <LiquidCrystal.h>
-#include <DFR_Key.h>
+#include <LiquidCrystal_i2c.h>
+
 
   
 #define  noteoff_size 32   // size of the noteoff arrays in memory

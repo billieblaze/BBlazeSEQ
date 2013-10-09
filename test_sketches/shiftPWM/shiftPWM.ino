@@ -61,7 +61,7 @@
 // Clock pin is SCK (Arduino: 13, Arduino Mega: 52, Teensy 2.0: 1, Teensy 2.0++: 21)
 
 // You can choose the latch pin yourself.
-const int ShiftPWM_latchPin=10;
+const int ShiftPWM_latchPin=49;
 
 // If your LED's turn on if the pin is low, set this to 1, otherwise set it to 0.
 const bool ShiftPWM_invertOutputs = 0; 

@@ -4,7 +4,7 @@
  * (c) Elco Jacobs, Sept 2011.
  * 
  *****************************************************************************/
-//#include <Servo.h>
+#include <Servo.h>
 #include <SPI.h>
 #include "hsv2rgb.h"
 
@@ -47,7 +47,7 @@ void setup()   {
   SPI.begin(); 
 
   Serial.begin(9600);
-
+Serial.print("START");
 
   ShiftMatrixPWM.SetMatrixSize(numRows, numColumnRegisters);
   ShiftMatrixPWM.Start(pwmFrequency,maxBrightness);  
@@ -62,7 +62,7 @@ void loop()
   ShiftMatrixPWM.PrintInterruptLoad();
 
   // Fade in and fade out all outputs one by one fast. Usefull for testing your circuit
-//ShiftMatrixPWM.OneByOneFast();  
+ShiftMatrixPWM.OneByOneFast();  
   
   // Fade in all outputs
  /* for(int j=0;j<maxBrightness;j++){
